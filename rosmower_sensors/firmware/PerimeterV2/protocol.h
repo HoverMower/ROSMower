@@ -20,6 +20,7 @@ typedef struct {
    bool left_timeout;
    bool right_timeout;
    bool calibrated;
+   bool dummy;
    uint16_t checksum;
 } SerialFeedback;
 
