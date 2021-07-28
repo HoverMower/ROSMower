@@ -19,5 +19,12 @@
 #define SWAP_COIL_POLARITY_LEFT false;
 #define SWAP_COIL_POLARITY_RIGHT true;
 
+/*-----other sensors active?---------*/
+#define BUTTON true
+#define pinButton 3
+
+#define BUMPER true
+#define pinBumperLeft  4
+#define pinBumperRight 5
 
 #endif

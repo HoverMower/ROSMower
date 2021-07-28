@@ -42,6 +42,16 @@ boolean inside = true;
 int mode = 0;
 static SerialFeedback feedback;
 
+// Button
+byte buttonCounter;
+byte lastButtonCount;
+unsigned long nextTimeButtonCheck;
+unsigned long nextTimeButton;
+// Bumper sensor
+boolean bumperLeft ;
+boolean bumperRight ;
+unsigned long nextTimeBumper ;
+
 void setup()  {
   Wire.begin();
   Serial.begin(SERIAL_BAUDRATE);
@@ -60,6 +70,24 @@ void setup()  {
   Serial.println("  v to toggle between serial chart/Serial output");
   Serial.println("  c to calibrate zero point (sender must be off!)");
   delay(1000);
+
+  // button
+  pinMode(pinButton, INPUT);
+  pinMode(pinButton, INPUT_PULLUP);
+
+  pinMode(pinBumperLeft, INPUT);
+  pinMode(pinBumperLeft, INPUT_PULLUP);
+  pinMode(pinBumperRight, INPUT);
+  pinMode(pinBumperRight, INPUT_PULLUP);
+
+
+  buttonCounter = 0;
+  lastButtonCount = 0;
+  bumperLeft = false;
+  bumperRight = false;
+  nextTimeButtonCheck = millis() + 50;
+  nextTimeBumper = millis() + 50;
+
 }
 
 
@@ -87,8 +115,17 @@ void printSerial() {
   Serial.print("\t");
   Serial.print("adc ");
   Serial.print((int)(ADCMan.getCapturedChannels()));
+  Serial.print("\t");
+  Serial.print("bumL");
+  Serial.print((int)bumperLeft);
+  Serial.print("\t");
+  Serial.print("bumR");
+  Serial.print((int)bumperRight);
+  Serial.print("\t");
+  Serial.print("btn ");
+  Serial.print((int)lastButtonCount);
   Serial.println();
- 
+
 }
 
 void sendMessage() {
@@ -103,10 +140,14 @@ void sendMessage() {
   feedback.left_timeout = (bool)perimeter.signalTimedOut(0);
   feedback.right_timeout = (bool)perimeter.signalTimedOut(1);
   feedback.calibrated = (bool)ADCMan.calibrationDataAvail();
+  feedback.bumperLeft = bumperLeft;
+  feedback.bumperRight = bumperRight;
+  feedback.buttonCount = lastButtonCount;
   feedback.checksum = (uint16_t)(feedback.start ^ feedback.left_mag ^ feedback.right_mag ^ feedback.left_smag ^ feedback.right_smag ^ feedback.left_inside ^ feedback.right_inside ^
-                                 feedback.left_timeout ^ feedback.right_timeout ^ feedback.calibrated );
-  
-    Serial.write((uint8_t *)&feedback, sizeof(feedback));
+                                 feedback.left_timeout ^ feedback.right_timeout ^ feedback.calibrated ^ feedback.bumperLeft ^ feedback.bumperRight ^ feedback.buttonCount );
+
+  Serial.write((uint8_t *)&feedback, sizeof(feedback));
+
 }
 
 void loop()  {
@@ -124,21 +165,56 @@ void loop()  {
     }
   }
 
+  if (BUTTON) checkButton();
+  if (BUMPER) checkBumper();
+
+
+  /* Set info to ROS */
   if (millis() >= nextTime) {
     nextTime = millis() + 1000 / SERIAL_RATE;
-    //if (perimeter.isInside(0) != inside){
-    // inside = perimeter.isInside(0);
-    //}
-    //if (perimeter.isInside(0)) digitalWrite(pinLED, HIGH);
-    //else digitalWrite(pinLED, LOW);
-
     if (DEBUG_OUTPUT) {
-      printSerial();
+       printSerial();
     }
     else
     {
       sendMessage();
     }
+    lastButtonCount = 0;
 
   }
+}
+
+void checkButton()
+{
+  if ((millis() < nextTimeButtonCheck))
+    return;
+
+  nextTimeButtonCheck = millis() + 50;
+  boolean buttonPressed = (digitalRead(pinButton) == LOW );
+
+  if (((!buttonPressed) && (buttonCounter > 0)) || ((buttonPressed) && (millis() >= nextTimeButton)))
+  {
+    nextTimeButton = millis() + 1000;
+    if (buttonPressed)
+    {
+      buttonCounter++;
+    }
+    else {
+      lastButtonCount = buttonCounter;
+      // Button has been released, buttonCounter has correct value now
+      buttonCounter = 0;
+
+    }
+  }
+}
+
+void checkBumper()
+{
+  if ((millis() >= nextTimeBumper)) {
+    nextTimeBumper = millis() + 50;
+
+    bumperLeft = (digitalRead(pinBumperLeft) == HIGH);
+    bumperRight = (digitalRead(pinBumperRight) == HIGH);
+  }
+
 }
