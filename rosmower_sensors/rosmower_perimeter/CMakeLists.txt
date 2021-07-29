@@ -11,11 +11,14 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   rosmower_msgs
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+generate_dynamic_reconfigure_options(
+  config/perimeter.cfg
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -148,7 +151,7 @@ add_executable(${PROJECT_NAME}
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+add_dependencies(rosmower_perimeter ${PROJECT_NAME}_gencfg)
 ## Specify libraries to link a library or executable target against
  target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}

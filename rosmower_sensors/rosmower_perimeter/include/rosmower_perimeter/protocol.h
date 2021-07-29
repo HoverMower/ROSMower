@@ -20,7 +20,9 @@ typedef struct {
    bool left_timeout;
    bool right_timeout;
    bool calibrated;
-   bool dummy;
+   bool bumperLeft;
+   bool bumperRight;
+   unsigned char buttonCount;
    uint16_t checksum;
 } SerialFeedback;
 
