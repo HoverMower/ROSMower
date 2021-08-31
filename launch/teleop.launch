@@ -10,6 +10,9 @@
     
   </include> 
 
+<!-- Lidar -->
+  <include file="$(find ldlidar)/launch/ld06.launch">
+  </include> 
 
     <node name="hoverboard_driver" pkg="hoverboard_driver" type="hoverboard_driver" output="screen"/>
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"

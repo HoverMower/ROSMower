@@ -74,7 +74,7 @@
   </link>
  
   <joint name="base_link_joint" type="fixed">
-    <origin xyz="0 0 ${wheel_radius + 0.005}" rpy="0 0 0" />
+    <origin xyz="0.14 0 ${wheel_radius + 0.005}" rpy="0 0 0" />
     <parent link="base_footprint"/>
     <child link="base_link" />
   </joint>
@@ -149,16 +149,16 @@
   <joint name="imu_joint" type="fixed">
     <parent link="base_link" />
     <child link="imu" />
-    <origin xyz="0.16 -0.065 0.035" rpy="0 0 0" />
+    <origin xyz="0.157 0.0 0.20" rpy="0 0 0" />
   </joint>
   <link name="imu" />
 
   <joint name="lidar_joint" type="fixed">
     <parent link="base_link" />
-    <child link="lidar" />
-    <origin xyz="0.0 0.0 0.12" rpy="0 0 3.14159" />
+    <child link="lidar_frame" />
+    <origin xyz="0.157 0.0 0.21" rpy="0 0 0" />
   </joint>
-  <link name="lidar">
+  <link name="lidar_frame">
     <visual>
       <material name="blue" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
