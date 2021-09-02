@@ -1,0 +1,66 @@
+<launch>
+    <rosparam file="$(find hoverboard_driver)/config/hardware.yaml" command="load"/>
+    <rosparam file="$(find hoverboard_driver)/config/controllers.yaml" command="load"/>
+
+
+  <remap from="/cmd_vel" to="/hoverboard_velocity_controller/cmd_vel"/> 
+ 
+
+      <!-- PS4 joypad -->
+  <include file="$(find ds4_driver)/launch/ds4_twist.launch">
+    <arg name="dof" value="2"/> 
+    <!--<arg name="topic" value="joy_vel"/> -->
+    
+  </include> 
+
+<!-- Lidar -->
+  <include file="$(find ldlidar)/launch/ld06.launch" />
+
+    <node name="hoverboard_driver" pkg="hoverboard_driver" type="hoverboard_driver" output="screen"/>
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"
+        args="hoverboard_joint_publisher hoverboard_velocity_controller" />
+
+
+  <!-- IMU Data Publisher Using the BNO085 IMU Sensor -->
+  <!-- Publish: /imu/data -->
+    <node name="ros_bno08x" pkg="ros_bno08x" type="talker.py" respawn="true" respawn_delay="2">
+       <param name="frame_id" value="imu" />
+       <param name="cov_linear" value="0.60" />        <!-- linear covariance +-80mg taken from https://github.com/Vijfendertig/rosserial_adafruit_bno055 -->
+       <param name="cov_angular" value="0.003" />      <!-- angular covariance +- 3deg/s -->
+       <param name="cov_orientation" value="0.002" />  <!-- magnetic covariance +-2.5deg -->
+       <param name="cov_magnetic" value="0.002" />     <!-- magnetic covariance +-2.5deg -->
+  </node>
+
+
+  <!-- Extended Kalman Filter from robot_pose_ekf Node-->
+  <!-- Subscribe: /odom, /imu_data, /vo -->
+  <!-- Publish: /robot_pose_ekf/odom_combined -->
+
+  <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+    <param name="output_frame" value="odom"/>
+    <param name="base_footprint_frame" value="base_footprint"/>
+    <param name="freq" value="30.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="true"/>
+    <param name="vo_used" value="false"/>
+    <param name="gps_used" value="false"/>
+    <param name="debug" value="false"/>
+    <param name="self_diagnose" value="false"/>
+
+    <remap from="odom" to="/hoverboard_velocity_controller/odom"/>
+    <remap from="imu_data" to="bno08x/raw" />  
+  </node>
+     
+  <!-- Initial Pose and Goal Publisher -->
+  <!-- Publish: /initialpose, /move_base_simple/goal -->
+ <!-- <node pkg="rviz" type="rviz" name="rviz">
+  </node>  -->
+ 
+
+
+  <!-- Model and state publisher -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find rosmower)/urdf/rosmower.xacro"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  </launch>
