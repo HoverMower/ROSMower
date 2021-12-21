@@ -55,7 +55,7 @@ unsigned long nextTimeBumper ;
 void setup()  {
   Wire.begin();
   Serial.begin(SERIAL_BAUDRATE);
-  pinMode(pinLED, OUTPUT);
+//  pinMode(pinLED, OUTPUT);
 
   delay(100);
   Serial.println("START");
