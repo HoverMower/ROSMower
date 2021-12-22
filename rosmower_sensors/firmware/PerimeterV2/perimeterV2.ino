@@ -34,7 +34,6 @@
 #include "config.h"
 #include "protocol.h"
 
-
 Perimeter perimeter;
 unsigned long nextTime = 0;
 int counter = 0;
@@ -48,14 +47,31 @@ byte lastButtonCount;
 unsigned long nextTimeButtonCheck;
 unsigned long nextTimeButton;
 // Bumper sensor
-boolean bumperLeft ;
-boolean bumperRight ;
-unsigned long nextTimeBumper ;
+boolean bumperLeft;
+boolean bumperRight;
+unsigned long nextTimeBumper;
 
-void setup()  {
+// Battery
+unsigned long nextTimeBatteryCheck;
+float batVoltage;
+float batSwitchOffIfBelow;     // switch off if below voltage (Volt)
+int batSwitchOffIfIdle;        // switch off battery if idle for minutes
+float batFactor;               // battery conversion factor
+float batChgFactor;            // battery conversion factor
+float batFull;                 // battery reference Voltage (fully charged)
+float batChargingCurrentMax;   // maximum current your charger can devliver
+float batFullCurrent;          // current flowing when battery is fully charged
+float startChargingIfBelow;    // start charging if battery Voltage is below
+float chgFactor       ;     // charge current conversion factor
+float chgVoltage ;  // charge voltage (Volt)
+float chgCurrent ;  // charge current  (Ampere)
+unsigned long chargingTimeout; // safety timer for charging
+
+void setup()
+{
   Wire.begin();
   Serial.begin(SERIAL_BAUDRATE);
-//  pinMode(pinLED, OUTPUT);
+  //  pinMode(pinLED, OUTPUT);
 
   delay(100);
   Serial.println("START");
@@ -80,6 +96,12 @@ void setup()  {
   pinMode(pinBumperRight, INPUT);
   pinMode(pinBumperRight, INPUT_PULLUP);
 
+  // battery
+  pinMode(pinBatteryVoltage, INPUT);        
+  pinMode(pinChargeCurrent, INPUT);          
+  pinMode(pinChargeVoltage, INPUT);            
+  pinMode(pinChargeEnable, OUTPUT);
+
 
   buttonCounter = 0;
   lastButtonCount = 0;
@@ -87,11 +109,13 @@ void setup()  {
   bumperRight = false;
   nextTimeButtonCheck = millis() + 50;
   nextTimeBumper = millis() + 50;
+  nextTimeBatteryCheck = millis() + 50;
 
+  batFactor = voltageDividerUges(150, 10, 1.0) * ADC2voltage(1) * 10; // ADC to battery voltage factor *10
 }
 
-
-void printSerial() {
+void printSerial()
+{
   Serial.print("mag ");
   Serial.print((int)perimeter.getMagnitude(0));
   Serial.print(",");
@@ -125,10 +149,10 @@ void printSerial() {
   Serial.print("btn ");
   Serial.print((int)lastButtonCount);
   Serial.println();
-
 }
 
-void sendMessage() {
+void sendMessage()
+{
 
   feedback.start = (uint16_t)START_FRAME;
   feedback.left_mag = (int16_t)perimeter.getMagnitude(0);
@@ -144,20 +168,23 @@ void sendMessage() {
   feedback.bumperRight = bumperRight;
   feedback.buttonCount = lastButtonCount;
   feedback.checksum = (uint16_t)(feedback.start ^ feedback.left_mag ^ feedback.right_mag ^ feedback.left_smag ^ feedback.right_smag ^ feedback.left_inside ^ feedback.right_inside ^
-                                 feedback.left_timeout ^ feedback.right_timeout ^ feedback.calibrated ^ feedback.bumperLeft ^ feedback.bumperRight ^ feedback.buttonCount );
+                                 feedback.left_timeout ^ feedback.right_timeout ^ feedback.calibrated ^ feedback.bumperLeft ^ feedback.bumperRight ^ feedback.buttonCount);
 
   Serial.write((uint8_t *)&feedback, sizeof(feedback));
-
 }
 
-void loop()  {
+void loop()
+{
 
   ADCMan.run();
 
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0)
+  {
     char ch = (char)Serial.read();
-    if (ch == 'v') mode = !mode;
-    if (ch == 'c') {
+    if (ch == 'v')
+      mode = !mode;
+    if (ch == 'c')
+    {
       Serial.println("calibrating ADC (power off sender for this!)...");
       Serial.flush();
       delay(5000);
@@ -165,22 +192,24 @@ void loop()  {
     }
   }
 
-  if (BUTTON) checkButton();
-  if (BUMPER) checkBumper();
-
+  if (BUTTON)
+    checkButton();
+  if (BUMPER)
+    checkBumper();
 
   /* Set info to ROS */
-  if (millis() >= nextTime) {
+  if (millis() >= nextTime)
+  {
     nextTime = millis() + 1000 / SERIAL_RATE;
-    if (DEBUG_OUTPUT) {
-       printSerial();
+    if (DEBUG_OUTPUT)
+    {
+      printSerial();
     }
     else
     {
       sendMessage();
     }
     lastButtonCount = 0;
-
   }
 }
 
@@ -190,7 +219,7 @@ void checkButton()
     return;
 
   nextTimeButtonCheck = millis() + 50;
-  boolean buttonPressed = (digitalRead(pinButton) == LOW );
+  boolean buttonPressed = (digitalRead(pinButton) == LOW);
 
   if (((!buttonPressed) && (buttonCounter > 0)) || ((buttonPressed) && (millis() >= nextTimeButton)))
   {
@@ -199,22 +228,62 @@ void checkButton()
     {
       buttonCounter++;
     }
-    else {
+    else
+    {
       lastButtonCount = buttonCounter;
       // Button has been released, buttonCounter has correct value now
       buttonCounter = 0;
-
     }
   }
 }
 
 void checkBumper()
 {
-  if ((millis() >= nextTimeBumper)) {
+  if ((millis() >= nextTimeBumper))
+  {
     nextTimeBumper = millis() + 50;
 
     bumperLeft = (digitalRead(pinBumperLeft) == HIGH);
     bumperRight = (digitalRead(pinBumperRight) == HIGH);
   }
+}
 
+void checkBattery()
+{
+  if (BATMON)
+  {
+    if (millis() < nextTimeBatteryCheck)
+      return;
+    nextTimeBatteryCheck = millis() + 1000;
+
+    // convert to double  
+    int batADC = ADCMan.read(pinBatteryVoltage);
+		int currentADC = ADCMan.read(pinChargeCurrent);
+		int chgADC = ADCMan.read(pinChargeVoltage);    
+		
+    double batvolt = ((double)batADC) * batFactor;    
+    double chgvolt = ((double)chgADC) * batChgFactor; 
+		double curramp = ((double)currentADC) * chgFactor;
+
+    // low-pass filter
+    double accel = 0.01;
+		//double accel = 1.0;
+    if (abs(batVoltage-batvolt)>5)   batVoltage = batvolt; else batVoltage = (1.0-accel) * batVoltage + accel * batvolt;
+    if (abs(chgVoltage-chgvolt)>5)   chgVoltage = chgvolt; else chgVoltage = (1.0-accel) * chgVoltage + accel * chgvolt;
+		if (abs(chgCurrent-curramp)>0.5) chgCurrent = curramp; else chgCurrent = (1.0-accel) * chgCurrent + accel * curramp;       
+
+    
+  }
+}
+
+// Spannungsteiler Gesamtspannung ermitteln (Reihenschaltung R1-R2, U2 bekannt, U_GES zu ermitteln)
+float voltageDividerUges(float R1, float R2, float U2)
+{
+  return (U2 / R2 * (R1 + R2)); // Uges
+}
+
+// ADC-value to voltage
+float ADC2voltage(float ADCvalue)
+{
+  return (ADCvalue / 1023.0 * IOREF); // ADCman works @ 10 bit
 }
