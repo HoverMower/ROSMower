@@ -42,11 +42,6 @@
     </inertial>
   </xacro:macro>
 
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> 404f13884297039cacb8e9d9ec9f42bed27634ba
   <link name="base_footprint">
     <xacro:box_inertia m="8" w="0.001" h="0.001" d="0.001"/>
     <visual>
@@ -56,11 +51,7 @@
             <box size="0.001 0.001 0.001" />
         </geometry>
     </visual>
-<<<<<<< HEAD
   </link> 
-=======
-  </link>
->>>>>>> 404f13884297039cacb8e9d9ec9f42bed27634ba
 
  
   <link name="base_link">
