@@ -139,36 +139,54 @@
     <child link="caster_wheel"/>
     <origin xyz="${caster_wheel_joint_offset} 0 -${0.06+caster_wheel_radius}" rpy="0 0 0"/>
   </joint>
-
+-->
   <joint name="imu_joint" type="fixed">
     <parent link="base_link" />
     <child link="imu" />
-    <origin xyz="0.157 0.0 0.20" rpy="0 0 0" />
+    <origin xyz="0.092 0.0 0.105" rpy="0 0 0" />
   </joint>
   <link name="imu" />
 
   <joint name="lidar_joint" type="fixed">
     <parent link="base_link" />
     <child link="lidar_frame" />
-    <origin xyz="0.157 0.0 0.21" rpy="0 0 0" />
+    <origin xyz="0.242 0.0 0.195" rpy="0 0 0" />
   </joint>
-  <link name="lidar_frame">
-    <visual>
-      <material name="blue" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.032" length="0.02"/>
-      </geometry>
-    </visual>
-  </link>
+  <link name="lidar_frame" type="fixed"/>
 
   <joint name="camera_joint" type="fixed">
-    <origin xyz="0.185 0 0.07" rpy="0 0 3.14159" />
+    <origin xyz="0.35 0 0.117" rpy="0 0 0" />
     <parent link="base_link" />
     <child link="camera_link" />
   </joint>
-  <link name="camera_link" type="fixed">
-  </link>
-  -->
+  <link name="camera_link" type="fixed"/>
+  
+  <joint name="perimeter_left_joint" type="fixed">
+    <origin xyz="0.385 0.081 0.025" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="perimeter_left" />
+  </joint>
+  <link name="perimeter_left" type="fixed"/>
+  
+  <joint name="perimeter_right_joint" type="fixed">
+    <origin xyz="0.385 -0.081 0.025" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="perimeter_right" />
+  </joint>
+  <link name="perimeter_right" type="fixed"/>  
+
+  <joint name="bumper_left_joint" type="fixed">
+    <origin xyz="0.45 0.101 0.040" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="bumper_left" />
+  </joint>
+  <link name="bumper_left" type="fixed"/>
+
+  <joint name="bumper_right_joint" type="fixed">
+    <origin xyz="0.45 -0.101 0.040" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="bumper_right" />
+  </joint>
+  <link name="bumper_right" type="fixed"/>
 
 </robot>
