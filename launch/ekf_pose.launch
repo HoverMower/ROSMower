@@ -15,6 +15,14 @@
        <param name="cov_magnetic" value="0.002" />     <!-- magnetic covariance +-2.5deg -->
   </node>
 
+  <!-- Realsense depth camera 
+<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="initial_reset" value="true"/>
+    <arg name="color_width" value="424" />
+    <arg name="color_height" value="240" />
+    <arg name="color_fps" value="6" />
+    <arg name="filters" value="pointcloud" />
+  </include> -->
 
   <!-- Extended Kalman Filter from robot_pose_ekf Node-->
   <!-- Subscribe: /odom, /imu_data, /vo -->
