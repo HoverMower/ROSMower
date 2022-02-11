@@ -2,6 +2,7 @@
 #define _ROSMOWER_OLED_H
 
 #include <ros/ros.h>
+#include <string.h>
 #include "rosmower_msgs/PerimeterMsg.h"
 #include "rosmower_msgs/Bumper.h"
 #include "rosmower_msgs/Battery.h"
@@ -15,7 +16,8 @@ public:
     ROSMower_oled();
     ~ROSMower_oled();
 
-    void batteryCallback
+    void batteryCallback(const rosmower_msgs::Battery::ConstPtr& msg);
+    void update();
 
 private:
                            
@@ -25,6 +27,9 @@ private:
 
     // Subscriber
     ros::Subscriber sub_battery;
+
+    // Lines to display
+    std::string line1 = "Here somes the text\n";
 
 };
 

@@ -5,7 +5,9 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  
+  std_msgs
+  rosmower_msgs
+  oled_display_node  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -15,22 +17,23 @@ find_package(Boost REQUIRED COMPONENTS system)
 #)
 
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS roscpp rosmower_msgs
 )
 
-#include_directories(
-# include
-# include/hoverboard_driver
-#  ${catkin_INCLUDE_DIRS}
+include_directories(
+ include
+ include/ROSMower
+ ${catkin_INCLUDE_DIRS}
 # ${Boost_INCLUDE_DIRS}
-#)
+)
 
-#add_executable(${PROJECT_NAME} 
-#  src/hoverboard.cpp 
-#  src/pid.cpp
+add_executable(${PROJECT_NAME} 
+  src/main_oled.cpp 
+  src/ROSMower_oled.cpp
 #  src/main.cpp
-#)
-#target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 #add_dependencies(hoverboard_driver ${PROJECT_NAME}_gencfg)
 

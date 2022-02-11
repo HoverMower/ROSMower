@@ -13,14 +13,22 @@ ROSMower_oled::~ROSMower_oled()
     
 }
 
-ROSMower_oled::batteryCallback(const rosmower_msgs::BatteryMsg::ConstPtr& msg)
+void ROSMower_oled::batteryCallback(const rosmower_msgs::Battery::ConstPtr& msg)
 {
-   oled_display_node::DisplayOutput msg;
-   msg.row = 0;
-   msg.column = 0;
-   msg.text ="BatVCC: %d
+   line1 = "BatVCC: " + std::to_string(msg->battery_voltage);
+}
 
-   ROS_INFO("I heard: [%s]", msg->data.c_str());
+void ROSMower_oled::update()
+{
+   oled_display_node::DisplayOutput output;
+   output.actionType    = 2;
+   output.row           = 3;
+   output.column        = 1;
+   output.numChars      = 15;
+   output.attributes    = 0;
+   output.text          = line1;
+
+   pub_oled.publish(output);
 }
 
 
