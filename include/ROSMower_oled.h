@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <string.h>
+#include <stdio.h>
 #include "rosmower_msgs/PerimeterMsg.h"
 #include "rosmower_msgs/Bumper.h"
 #include "rosmower_msgs/Battery.h"
@@ -29,7 +30,7 @@ private:
     ros::Subscriber sub_battery;
 
     // Lines to display
-    std::string line1 = "Here somes the text\n";
+    char line1[15] = "Hello Text    ";
 
 };
 

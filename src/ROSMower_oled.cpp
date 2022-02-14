@@ -15,14 +15,15 @@ ROSMower_oled::~ROSMower_oled()
 
 void ROSMower_oled::batteryCallback(const rosmower_msgs::Battery::ConstPtr& msg)
 {
-   line1 = "BatVCC: " + std::to_string(msg->battery_voltage);
+int test = snprintf(line1, 15, "B %2.2f CA %2.2f\0", msg->battery_voltage, msg->charge_current);
+//   line1 = "BatV: " + std::to_string(msg->battery_voltage);
 }
 
 void ROSMower_oled::update()
 {
    oled_display_node::DisplayOutput output;
    output.actionType    = 2;
-   output.row           = 3;
+   output.row           = 2;
    output.column        = 1;
    output.numChars      = 15;
    output.attributes    = 0;
