@@ -17,21 +17,27 @@ public:
     ROSMower_oled();
     ~ROSMower_oled();
 
-    void batteryCallback(const rosmower_msgs::Battery::ConstPtr& msg);
+    void batteryCallback(const rosmower_msgs::Battery::ConstPtr &msg);
+    void perimeterCallback(const rosmower_msgs::PerimeterMsg::ConstPtr &msg);
     void update();
 
 private:
-                           
     // Publishers
     ros::NodeHandle nh;
     ros::Publisher pub_oled;
 
     // Subscriber
     ros::Subscriber sub_battery;
+    ros::Subscriber sub_perimeter;
 
     // Lines to display
-    char line1[15] = "Hello Text    ";
+    char line1[15] = "Startup ROS   ";
+    char line2[15] = "ROSMOWER      ";
+    char line3[15] = "V0.0.0        ";
 
+    // other variables
+    char peri_left_state = ' ';
+    char peri_right_state = ' ';
 };
 
 #endif
