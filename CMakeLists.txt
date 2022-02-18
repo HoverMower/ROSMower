@@ -7,7 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   rosmower_msgs
-  oled_display_node  
+  oled_display_node
+  ds4_driver  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -31,6 +32,7 @@ include_directories(
 add_executable(${PROJECT_NAME} 
   src/main_oled.cpp 
   src/ROSMower_oled.cpp
+  src/ROSMower_ds4.cpp
 #  src/main.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})

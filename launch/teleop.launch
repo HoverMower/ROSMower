@@ -2,11 +2,10 @@
     <rosparam file="$(find hoverboard_driver)/config/hardware.yaml" command="load"/>
     <rosparam file="$(find hoverboard_driver)/config/controllers.yaml" command="load"/>
 
-      <!-- PS4 joypad -->
-  <remap from="/cmd_vel" to="/hoverboard_velocity_controller/cmd_vel"/>    
+      <!-- PS4 joypad -->   
   <include file="$(find ds4_driver)/launch/ds4_twist.launch">
     <arg name="dof" value="2"/> 
-    <!--<arg name="topic" value="joy_vel"/> -->
+    <arg name="topic" value="joy_vel"/> 
     
   </include> 
 
@@ -15,9 +14,19 @@
   <include file="$(find ldlidar)/launch/ld06.launch">
   </include> 
 
+<!-- TWIST MUX -->
+  <node pkg="twist_mux" type="twist_mux" name="twist_mux">
+    <rosparam command="load" file="$(find rosmower)/conf/twist_mux.yaml" />
+    <remap from="cmd_vel_out" to="hoverboard_velocity_controller/cmd_vel"/> 
+  </node>
 
 <!-- Base controller -->
 <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch"/>
+
+<!-- OLED Display -->
+  <include file="$(find oled_display_node)/launch/display.launch">
+  </include>
+  <node name="rosmower" pkg="rosmower" type="rosmower" output="screen" /> 
 
     <node name="hoverboard_driver" pkg="hoverboard_driver" type="hoverboard_driver" output="screen"/>
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"
