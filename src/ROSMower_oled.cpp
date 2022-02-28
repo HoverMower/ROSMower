@@ -5,8 +5,8 @@ ROSMower_oled::ROSMower_oled()
 
     // Register  publisher
     pub_oled = nh.advertise<oled_display_node::DisplayOutput>("display_node", 3);
-    sub_battery = nh.subscribe("sensors/Battery", 1000, &ROSMower_oled::batteryCallback, this);
-    sub_perimeter = nh.subscribe("sensors/Perimeter", 1000, &ROSMower_oled::perimeterCallback, this);
+    sub_battery = nh.subscribe("hovermower/sensors/Battery", 1000, &ROSMower_oled::batteryCallback, this);
+    sub_perimeter = nh.subscribe("hovermower/sensors/Perimeter", 1000, &ROSMower_oled::perimeterCallback, this);
 }
 
 ROSMower_oled::~ROSMower_oled()

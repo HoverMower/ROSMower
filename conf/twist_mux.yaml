@@ -8,7 +8,7 @@ topics:
   timeout : 0.1
   priority: 20
 - name    : navigation
-  topic   : cmd_vel
+  topic   : nav_cmd_vel
   timeout : 0.1
   priority: 5
 locks:
