@@ -28,6 +28,8 @@
       <arg name="depth_fps"             value="$(arg depth_fps)"/>
       <arg name="clip_distance"         value="$(arg clip_distance)"/>
       <arg name="enable_infra"          value="false" />
+    <!--  <arg name="enable_infra1"         value="true" /> 
+      <arg name="enable_infra2"         value="true" /> -->
     </include>
   </group>
 </launch>

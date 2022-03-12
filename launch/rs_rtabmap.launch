@@ -31,8 +31,16 @@
             <arg name="odom_topic"         value="/odom"/>
             <arg name="odom_frame_id"      value="odom" />
             <arg name="subscribe_scan"     value="true" />
+            
             <arg name="rgb_topic"          value="/$(arg camera)/color/image_raw"/>
-            <arg name="camera_info_topic"  value="/$(arg camera)/color/camera_info"/>
+            <arg name="camera_info_topic"  value="/$(arg camera)/color/camera_info"/> 
+            <arg name="left_image_topic"   value="/$(arg camera)/infra1/image_rect_raw" />
+  <!-- Outdoor stereo, needs a calibrated camera but might work better
+   <arg name="right_image_topic" value="/$(arg camera)/infra2/image_rect_raw" />
+   <arg name="left_camera_info_topic" value="/$(arg camera)/infra1/camera_info" />
+   <arg name="right_camera_info_topic" value="/$(arg camera)/infra2/camera_info" />
+   <arg name="stereo" value="true" />
+   -->
             <arg name="approx_sync"        value="true" />
             <arg name="queue_size"         value="200"/>
             <arg name="rviz"               value="$(arg use_rviz)"/>
