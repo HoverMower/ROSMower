@@ -5,10 +5,11 @@ TrajectoryPlannerROS:
   acc_lim_y:  0.75
   acc_lim_theta: 4.00
   max_vel_x:  0.500
-  #min_vel_x:  0.212
+  min_vel_x:  -0.2 # reverse
+  max_vel_x_backwards: 0.2 #reverse for TebLocalPlanner, if used
   max_rotational_vel: 0.550
   min_in_place_rotational_vel: 0.15
-  escape_vel: -0.10
+  escape_vel: -0.20 # reverse
   holonomic_robot: false
 
   #xy_goal_tolerance:  0.20
