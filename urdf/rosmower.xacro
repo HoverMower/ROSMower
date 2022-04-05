@@ -11,8 +11,8 @@
   <xacro:property name="caster_wheel_radius" value="0.035"/>
   <xacro:property name="caster_wheel_joint_offset" value="0.12"/>
 
-  <xacro:include filename="$(find rosmower)/urdf/rosmower_gazebo_plugins.xacro"/>
-  
+ <!-- <xacro:include filename="$(find rosmower)/urdf/rosmower_gazebo_plugins.xacro"/>
+  -->
   <material name="blue">
     <color rgba="0 0 0.8 1"/>
   </material>

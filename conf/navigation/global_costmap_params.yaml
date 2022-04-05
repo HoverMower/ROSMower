@@ -1,7 +1,6 @@
 global_costmap:
   global_frame: map
-  robot_base_frame: base_link
+  robot_base_frame: base_footprint
   update_frequency: 0.5
   publish_frequency: 0.5
-#  static_map: false
-  rolling_window: true
+  static_map: false
