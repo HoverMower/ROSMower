@@ -5,14 +5,15 @@
  <remap from="/cmd_vel" to="/nav_cmd_vel"/>
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
-    <rosparam file="$(find rosmower)/conf/navigation_bak/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find rosmower)/conf/navigation_bak/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find rosmower)/conf/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find rosmower)/conf/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
     
-    <rosparam file="$(find rosmower)/conf/navigation_bak/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find rosmower)/conf/navigation_bak/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find rosmower)/conf/navigation_bak/teb_base_local_planner_params.yaml" command="load" /> 
+    <rosparam file="$(find rosmower)/conf/navigation/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rosmower)/conf/navigation/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rosmower)/conf/navigation/teb_base_local_planner_params.yaml" command="load" /> 
    
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <rosparam file="$(find rosmower)/conf/navigation/teb_costmap_converter_params.yaml" command="load" />
     <param name="controller_frequency" value="5.0" />   
   </node>
 

@@ -2,7 +2,7 @@ topics:
 - name    : joypad
   topic   : joy_vel
   timeout : 0.1
-  priority: 10
+  priority: 100
 - name    : keyboard
   topic   : keyboard_teleop/cmd_vel
   timeout : 0.1
@@ -15,4 +15,4 @@ locks:
 - name    : e_stop
   topic   : e_stop
   timeout : 0.0
-  priority: 255
+  priority: 100
