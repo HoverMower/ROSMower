@@ -37,4 +37,8 @@
   <node name="hoverboard_driver" pkg="hoverboard_driver" type="hoverboard_driver" output="screen"/>
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/" args="hoverboard_joint_publisher hoverboard_velocity_controller" />
 
+<!-- ROS Bridge for webViz-->
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
+       <arg name="port" value="8080"/>
+    </include>
 </launch>

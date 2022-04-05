@@ -13,7 +13,6 @@ local_costmap:
   origin_y: -2.0
 
 
-
   # assuming receiving a cloud from rtabmap_ros/obstacles_detection node
 #  point_cloud_sensor: {
 #    sensor_frame: base_footprint,
