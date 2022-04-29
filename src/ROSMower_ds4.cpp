@@ -28,6 +28,11 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     {
         _e_stop = !_e_stop;
         _ds4_last_button_circle = msg->button_circle;
+
+            std_msgs::Bool msg_estop;
+    msg_estop.data = _e_stop;
+    pub_eStop.publish(msg_estop);
+    ros::spinOnce();
     }
     // reset if button has been released
     if (msg->button_circle == 0)

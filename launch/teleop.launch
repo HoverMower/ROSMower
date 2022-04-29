@@ -41,4 +41,5 @@
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
        <arg name="port" value="8080"/>
     </include>
+    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="screen" />
 </launch>

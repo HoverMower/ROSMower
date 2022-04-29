@@ -3,10 +3,18 @@ topics:
   topic   : joy_vel
   timeout : 0.1
   priority: 100
+- name    : safety_controller_bumper
+  topic   : safety_bump_vel
+  timeout : 0.1
+  priority: 50
+- name    : safety_controller_perimeter
+  topic   : safety_peri_vel
+  timeout : 0.1
+  priority: 50    
 - name    : keyboard
   topic   : keyboard_teleop/cmd_vel
   timeout : 0.1
-  priority: 20
+  priority: 99
 - name    : navigation
   topic   : nav_cmd_vel
   timeout : 0.1
