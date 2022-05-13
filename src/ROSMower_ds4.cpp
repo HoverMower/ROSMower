@@ -5,6 +5,7 @@ ROSMower_ds4::ROSMower_ds4()
 
     // Register  publisher
     pub_eStop = nh.advertise<std_msgs::Bool>("/e_stop", 3);
+    pub_point = nh.advertise<geometry_msgs::PointStamped>("/clicked_point", 3);
 
     // Register subscriber
     _sub_mow = nh.subscribe("hovermower/sensors/MowMotor", 1000, &ROSMower_ds4::mowCallback, this);
@@ -14,7 +15,10 @@ ROSMower_ds4::ROSMower_ds4()
     // register service clients
 
     _e_stop = false;
+
+    tfListener = new tf2_ros::TransformListener(tfBuffer);
 }
+
 
 ROSMower_ds4::~ROSMower_ds4()
 {
@@ -29,15 +33,27 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
         _e_stop = !_e_stop;
         _ds4_last_button_circle = msg->button_circle;
 
-            std_msgs::Bool msg_estop;
-    msg_estop.data = _e_stop;
-    pub_eStop.publish(msg_estop);
-    ros::spinOnce();
+        std_msgs::Bool msg_estop;
+        msg_estop.data = _e_stop;
+        pub_eStop.publish(msg_estop);
+        ros::spinOnce();
     }
     // reset if button has been released
     if (msg->button_circle == 0)
     {
         _ds4_last_button_circle = 0;
+    }
+
+    // Publish current pose as PointStamped
+    if (msg->button_triangle > 0 && msg->button_triangle != _ds4_last_button_triangle)
+    {
+        _ds4_last_button_triangle = msg->button_triangle;
+        publish_point();
+    }
+    // reset if button has been released
+    if (msg->button_triangle == 0)
+    {
+        _ds4_last_button_triangle = 0;
     }
 
     // enable Hoverboard PCB
@@ -52,7 +68,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     if (msg->button_r1 == 0)
     {
         _ds4_last_button_r1 = 0;
-    }    
+    }
 
     // LED headlights 1
     if (msg->button_l1 > 0 && msg->button_l1 != _ds4_last_button_l1)
@@ -74,7 +90,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     if (msg->button_l1 == 0)
     {
         _ds4_last_button_l1 = 0;
-    }     
+    }
     // LED headlights 2
     if (msg->button_l2 > 0 && msg->button_l2 != _ds4_last_button_l2)
     {
@@ -95,7 +111,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     if (msg->button_l2 == 0)
     {
         _ds4_last_button_l2 = 0;
-    } 
+    }
 
     // mow motor speed
     if (msg->button_square > 0 && msg->button_square != _ds4_last_button_square)
@@ -104,7 +120,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
         rosmower_msgs::setMowMotor srv;
         if (_mow_speed == 0)
         {
-            srv.request.Speed = 1000;
+            srv.request.Speed = 1500;
         }
         else
         {
@@ -116,7 +132,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     if (msg->button_square == 0)
     {
         _ds4_last_button_square = 0;
-    }     
+    }
 }
 
 void ROSMower_ds4::mowCallback(const rosmower_msgs::MowMotor::ConstPtr &msg)
@@ -130,9 +146,23 @@ void ROSMower_ds4::switchesCallback(const rosmower_msgs::Switches::ConstPtr &msg
     _switch2 = msg->switch2;
 }
 
-void ROSMower_ds4::update()
+void ROSMower_ds4::publish_point()
 {
-    std_msgs::Bool msg_estop;
-    msg_estop.data = _e_stop;
-    pub_eStop.publish(msg_estop);
+    geometry_msgs::TransformStamped transformStamped;
+    try
+    {
+        transformStamped = tfBuffer.lookupTransform("map", "base_link",
+                                                    ros::Time(0), ros::Duration(5.0));
+        geometry_msgs::PointStamped point;
+        point.header.stamp = ros::Time::now();
+        point.header.frame_id = "map";
+        point.point.x = transformStamped.transform.translation.x;
+        point.point.y = transformStamped.transform.translation.y;
+        point.point.z = 0;
+        pub_point.publish(point);
+    }
+    catch (tf2::TransformException &ex)
+    {
+        ROS_WARN("%s", ex.what());
+    }
 }

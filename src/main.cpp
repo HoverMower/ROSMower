@@ -10,7 +10,7 @@ int main(int argc, char **argv)
     ROSMower_ds4 ds4;
     ROSMower_SafetyController safetyController;
 
-    ros::AsyncSpinner spinner(1);
+    ros::AsyncSpinner spinner(0);
     spinner.start();
 
     ros::Rate rate(10.0);
@@ -18,8 +18,11 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
+        // DS4 controller gets startet by constructor
+
+        // Safety Controller to monitor bumper and perimeter
         safetyController.run();
-       // ds4.update();
+
         // slow down oled update
         rate_counter++;
         if (rate_counter == 10)

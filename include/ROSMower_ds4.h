@@ -11,6 +11,10 @@
 #include "rosmower_msgs/setMowMotor.h"
 #include "rosmower_msgs/Switches.h"
 #include "rosmower_msgs/MowMotor.h"
+#include "geometry_msgs/PointStamped.h"
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+#include <geometry_msgs/TransformStamped.h>
 
 class ROSMower_ds4
 {
@@ -24,9 +28,13 @@ public:
     void update();
 
 private:
+
+    
+    void publish_point();
     // Publishers
     ros::NodeHandle nh;
     ros::Publisher pub_eStop;
+    ros::Publisher pub_point;
 
     // Service Clients
     ros::ServiceClient _srv_pressSwitch = nh.serviceClient<rosmower_msgs::pressSwitch>("hovermower/pressSwitch");
@@ -38,6 +46,11 @@ private:
     ros::Subscriber _sub_mow;
     ros::Subscriber _sub_switches;
 
+    // tf
+    tf2_ros::Buffer tfBuffer;
+    tf2_ros::TransformListener* tfListener;
+    
+
     uint8_t _switch1;
     uint8_t _switch2;
     int _mow_speed;
@@ -48,6 +61,7 @@ private:
     int _ds4_last_button_r1 = 0;
     int _ds4_last_button_circle = 0;
     int _ds4_last_button_square = 0;
+    int _ds4_last_button_triangle = 0;
 
     bool _e_stop;
 

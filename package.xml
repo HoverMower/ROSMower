@@ -10,11 +10,17 @@
   <build_depend>rosmower_msgs</build_depend>
   <build_depend>ds4_driver</build_depend>
   <build_depend>oled_display_node</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2_geometry_msgs</build_depend>
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rosmower_msgs</exec_depend>
   <exec_depend>ds4_driver</exec_depend>
-  <exec_depend>oled_display_node</exec_depend>
+  <exec_depend>oled_display_node</exec_depend>  
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
 
   <export>
   </export>
