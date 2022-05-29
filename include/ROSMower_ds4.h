@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "std_msgs/Bool.h"
 #include "ds4_driver/Status.h"
+#include "sensor_msgs/Joy.h"
 #include "rosmower_msgs/pressSwitch.h"
 #include "rosmower_msgs/setSwitch.h"
 #include "rosmower_msgs/setMowMotor.h"
@@ -35,6 +36,7 @@ private:
     ros::NodeHandle nh;
     ros::Publisher pub_eStop;
     ros::Publisher pub_point;
+    ros::Publisher pub_joy;
 
     // Service Clients
     ros::ServiceClient _srv_pressSwitch = nh.serviceClient<rosmower_msgs::pressSwitch>("hovermower/pressSwitch");
@@ -62,8 +64,10 @@ private:
     int _ds4_last_button_circle = 0;
     int _ds4_last_button_square = 0;
     int _ds4_last_button_triangle = 0;
+    int _ds4_last_button_cross = 0;
 
     bool _e_stop;
+    bool _cross_pressed;
 
 };
 

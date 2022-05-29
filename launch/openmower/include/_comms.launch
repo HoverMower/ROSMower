@@ -1,0 +1,25 @@
+<!--
+    This launch file starts all communication needed in order to control and localize the bot.
+    I.e. the raw data comms to the Low Level Board, the GPS, etc.
+-->
+<launch>
+    <!-- TODO: Add parameter for simulation -->
+
+<!-- <node pkg="mower_comms" type="mower_comms" name="mower_comms">
+        <param name="ll_serial_port" value="/dev/ttyAMA0"/>
+        <param name="left_esc_serial_port" value="/dev/ttyAMA2"/>
+        <param name="right_esc_serial_port" value="/dev/ttyAMA4"/>
+        <param name="mow_esc_serial_port" value="/dev/ttyAMA3"/>
+    </node> -->
+    
+    <include file="$(find rosmower)/launch/openmower/include/_gps.launch">
+        <arg name="serial_port" value="ttyACM0"/>
+        <arg name="ntrip_ip" value="192.168.178.151"/>
+        <arg name="ntrip_port" value="2101"/>
+        <arg name="ntrip_endpoint" value="Pelm01"/>
+        <arg name="ntrip_user" value="rtk"/>
+        <arg name="ntrip_password" value="rtk_base"/>
+    </include>
+
+
+</launch>
