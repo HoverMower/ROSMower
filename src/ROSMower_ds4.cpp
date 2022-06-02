@@ -5,7 +5,7 @@ ROSMower_ds4::ROSMower_ds4()
 
     // Register  publisher
     pub_eStop = nh.advertise<std_msgs::Bool>("/e_stop", 3);
-    pub_point = nh.advertise<geometry_msgs::PointStamped>("/clicked_point", 3);
+    //pub_point = nh.advertise<geometry_msgs::PointStamped>("/clicked_point", 3);
    
     // Register subscriber
     _sub_mow = nh.subscribe("hovermower/sensors/MowMotor", 1000, &ROSMower_ds4::mowCallback, this);
@@ -66,7 +66,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     if (msg->button_triangle > 0 && msg->button_triangle != _ds4_last_button_triangle)
     {
         _ds4_last_button_triangle = msg->button_triangle;
-        publish_point();
+   //     publish_point();
     }
     // reset if button has been released
     if (msg->button_triangle == 0)

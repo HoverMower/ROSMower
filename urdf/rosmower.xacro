@@ -114,6 +114,13 @@
   </joint>
   <link name="lidar_frame" type="fixed"/>
 
+  <joint name="gps_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="gps_frame" />
+    <origin xyz="0.310 0.0 0.195" rpy="0 0 0" />
+  </joint>
+  <link name="gps_frame" type="fixed"/>
+
   <joint name="camera_joint" type="fixed">
     <origin xyz="0.35 0 0.117" rpy="0 0 0" />
     <parent link="base_link" />
