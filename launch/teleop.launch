@@ -1,4 +1,5 @@
 <launch>
+  
   <!-- Model and state publisher -->
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find rosmower)/urdf/rosmower.xacro"/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
@@ -27,7 +28,9 @@
   </node>
 
   <!-- Base controller -->
-  <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch"/>
+  <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch">
+    <arg name="device_port" value="/dev/ttyUSB0" />
+  </include>  
 
   <!-- OLED Display -->
   <include file="$(find oled_display_node)/launch/display.launch">
