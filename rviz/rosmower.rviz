@@ -7,11 +7,14 @@ Panels:
         - /Global Options1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /Global Map1/Costmap1
+        - /Global Map1
+        - /Global Map1/Costmap1/Status1
         - /Global Map1/Planner1
+        - /Local Map1
         - /Local Map1/Costmap1
         - /Local Map1/Planner1
         - /Amcl Particles1/Status1
+        - /Polygon1
         - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 434
@@ -33,7 +36,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Image
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -88,6 +91,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
         camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gps_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -199,7 +206,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /map
+      Topic: /mower_map_service/map
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -211,7 +218,7 @@ Visualization Manager:
           Draw Behind: true
           Enabled: true
           Name: Costmap
-          Topic: /move_base/global_costmap/costmap
+          Topic: /move_base_flex/global_costmap/costmap
           Unreliable: false
           Use Timestamp: false
           Value: true
@@ -235,7 +242,7 @@ Visualization Manager:
           Radius: 0.029999999329447746
           Shaft Diameter: 0.10000000149011612
           Shaft Length: 0.10000000149011612
-          Topic: /move_base/TrajectoryPlannerROS/global_plan
+          Topic: /move_base_flex/FTCPlanner/global_plan
           Unreliable: false
           Value: true
       Enabled: true
@@ -248,7 +255,7 @@ Visualization Manager:
           Draw Behind: false
           Enabled: true
           Name: Costmap
-          Topic: /move_base/local_costmap/costmap
+          Topic: /move_base_flex/local_costmap/costmap
           Unreliable: false
           Use Timestamp: false
           Value: true
@@ -272,7 +279,7 @@ Visualization Manager:
           Radius: 0.029999999329447746
           Shaft Diameter: 0.10000000149011612
           Shaft Length: 0.10000000149011612
-          Topic: /move_base/TrajectoryPlannerROS/local_plan
+          Topic: /move_base_flex/FTCPlanner/global_plan
           Unreliable: false
           Value: true
       Enabled: true
@@ -347,7 +354,7 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Polygon
-      Topic: /move_base/local_costmap/footprint
+      Topic: /move_base_flex/global_costmap/footprint
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -395,25 +402,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 8.667521476745605
+      Distance: 5.558527946472168
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.00901245977729559
-        Y: -0.1267929971218109
-        Z: 0.022313600406050682
+        X: 0.21943451464176178
+        Y: 0.2771531045436859
+        Z: -0.1786881387233734
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.174800157546997
+      Pitch: 1.424800157546997
       Target Frame: base_footprint
       Value: Orbit (rviz)
-      Yaw: 6.209139347076416
+      Yaw: 0.4609539806842804
     Saved: ~
 Window Geometry:
   Displays:

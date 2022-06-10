@@ -1,4 +1,11 @@
 <launch>
+    <arg name="device_type_camera"    		default="d4.5"/>	<!-- Note: using regular expression. match D435, D435i, D415... -->
+    <arg name="serial_no_camera"    			default=""/>
+    <arg name="camera"              			default="camera"/>		<!-- Note: Replace with camera name -->
+    <arg name="use_rviz"                  default="false"/>
+    <arg name="use_rtabmapviz"            default="false"/>
+    <arg name="clip_distance"             default="-2"/>
+
 
 <!-- elementary operations -->
   <include file="$(find rosmower)/launch/teleop.launch">
@@ -6,6 +13,15 @@
 
 <!-- GPS -->
 <include file="$(find open_mower)/launch/include/_comms.launch" />
+
+
+        <include file="$(find rosmower)/launch/rs_d400.launch">
+            <arg name="device_type_camera"             value="$(arg device_type_camera)"/>
+            <arg name="serial_no_camera"               value="$(arg serial_no_camera)"/>
+            <arg name="camera"                         value="$(arg camera)"/>
+            <arg name="clip_distance"                   value="$(arg clip_distance)"/>
+            
+    </include>
 
   <!-- IMU Data Publisher Using the BNO085 IMU Sensor -->
   <!-- Publish: /imu/data -->
