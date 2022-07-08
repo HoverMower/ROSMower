@@ -7,6 +7,8 @@ ROSMower_oled::ROSMower_oled()
     pub_oled = nh.advertise<oled_display_node::DisplayOutput>("display_node", 3);
     sub_battery = nh.subscribe("hovermower/sensors/Battery", 1000, &ROSMower_oled::batteryCallback, this);
     sub_perimeter = nh.subscribe("hovermower/sensors/Perimeter", 1000, &ROSMower_oled::perimeterCallback, this);
+    sub_gpsFix = nh.subscribe("ublox/fix", 1000, &ROSMower_oled::gpsFixCallback, this);
+    sub_gpsPos = nh.subscribe("ublox/navrelposned", 1000, &ROSMower_oled::gpsPosCallback, this);
 }
 
 ROSMower_oled::~ROSMower_oled()
@@ -66,6 +68,18 @@ void ROSMower_oled::perimeterCallback(const rosmower_msgs::PerimeterMsg::ConstPt
     }
 
     snprintf(line2, 15, "%c %i %c %i    ", peri_left_state, msg->left_mag, peri_right_state, msg->right_mag);
+}
+
+void ROSMower_oled::gpsFixCallback(const sensor_msgs::NavSatFix::ConstPtr &msg)
+{
+
+    this->gpsState = msg->status.status;
+}
+
+void ROSMower_oled::gpsPosCallback(const ublox_msgs::NavRELPOSNED9::ConstPtr &msg)
+{
+
+snprintf(line3, 15, "GPS %i %i    ", gpsState, msg->accN);
 }
 
 void ROSMower_oled::update()
