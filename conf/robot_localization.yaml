@@ -1,7 +1,7 @@
 # For parameter descriptions, please refer to the template parameter files for each node.
 
 ekf_se_odom:
-  frequency: 30
+  frequency: 10
   sensor_timeout: 0.1
   two_d_mode: true
   transform_time_offset: 0.0
@@ -20,7 +20,7 @@ ekf_se_odom:
 #vroll , vpitch, vyaw,
 #ax    , ay    , az
 
-  odom0: odom
+  odom0: /raw_odom
   odom0_config: [false, false,  false,
                  false, false, false,
                  true,  true,  true,
@@ -28,15 +28,15 @@ ekf_se_odom:
                  false, false, false]
   odom0_queue_size: 10
   odom0_nodelay: true
-  odom0_differential: true
+  odom0_differential: false
   odom0_relative: false
 
   imu0: imu/data
   imu0_config: [false, false, false,
-                true , true , true,
+                true , true , false,
                 false, false, false,
-                false, false, false,
-                false, false, false]
+                true, true, true,
+                true, true, true]
   imu0_nodelay: false
   imu0_differential: false
   imu0_relative: false
@@ -78,7 +78,7 @@ ekf_se_odom:
                                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1.0]
 
 ekf_se_map:
-  frequency: 30
+  frequency: 10
   sensor_timeout: 0.1
   two_d_mode: true
   transform_time_offset: 0.0
@@ -98,10 +98,10 @@ ekf_se_map:
 #vroll , vpitch, vyaw,
 #ax    , ay    , az
 
-  odom0: odom
+  odom0: /raw_odom
   odom0_config: [false, false, false,
                  false, false, false,
-                 true,  true,  false,
+                 true,  true,  true,
                  false, false, true,
                  false, false, false]
   odom0_queue_size: 10
@@ -122,11 +122,11 @@ ekf_se_map:
 
   imu0: imu/data
   imu0_config: [false, false, false,
-                true , true , true,
+                true , true , false,
                 false, false, false,
-                false, false, false,
-                false, false, false]
-  imu0_nodelay: true
+                true, true, true,
+                true, true, true]
+  imu0_nodelay: false
   imu0_differential: false
   imu0_relative: false
   imu0_queue_size: 10
@@ -167,10 +167,10 @@ ekf_se_map:
                                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1.0]
 
 navsat_transform:
-  frequency: 30
+  frequency: 10
   delay: 3.0
   #magnetic_declination_radians: 0.0429351  # For lat/long 55.944831, -3.186998
-  #yaw_offset: 1.570796327  # IMU reads 0 facing magnetic north, not east
+  yaw_offset: 1.570796327  # IMU reads 0 facing magnetic north, not east
   zero_altitude: true
   broadcast_utm_transform: true
   publish_filtered_gps: true

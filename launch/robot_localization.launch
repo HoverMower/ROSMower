@@ -47,7 +47,7 @@
 
 
   <rosparam command="load" file="$(find rosmower)/conf/robot_localization.yaml" />
-    <remap from="odom" to="/hoverboard_velocity_controller/odom"/>
+    <remap from="raw_odom" to="/hoverboard_velocity_controller/odom"/>
     <remap from="imu/data" to="bno08x/raw" /> 
     <remap from="gps/fix" to="ublox/fix" />
 
