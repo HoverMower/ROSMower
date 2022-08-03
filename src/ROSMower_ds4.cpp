@@ -28,10 +28,10 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
 {
     // e_stop
     // Ensures not to toggle for each incoming message, when button keeps pressed
-    if (msg->button_circle > 0 && msg->button_circle != _ds4_last_button_circle)
+    if (msg->button_l1 > 0 && msg->button_l1 != _ds4_last_button_l1)
     {
         _e_stop = !_e_stop;
-        _ds4_last_button_circle = msg->button_circle;
+        _ds4_last_button_l1 = msg->button_l1;
 
         std_msgs::Bool msg_estop;
         msg_estop.data = _e_stop;
@@ -39,14 +39,14 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
         ros::spinOnce();
     }
     // reset if button has been released
-    if (msg->button_circle == 0)
+    if (msg->button_l1 == 0)
     {
-        _ds4_last_button_circle = 0;
+        _ds4_last_button_l1 = 0;
     }
 
     // cross_pressed
     // Ensures not to toggle for each incoming message, when button keeps pressed
-   /* if (msg->button_cross > 0 && msg->button_cross != _ds4_last_button_cross)
+/*    if (msg->button_cross > 0 && msg->button_cross != _ds4_last_button_cross)
     {
         _cross_pressed = !_cross_pressed;
         _ds4_last_button_cross = msg->button_cross;
@@ -61,7 +61,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     {
         _ds4_last_button_cross = 0;
     }    
-*/
+
     // Publish current pose as PointStamped
     if (msg->button_triangle > 0 && msg->button_triangle != _ds4_last_button_triangle)
     {
@@ -73,7 +73,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     {
         _ds4_last_button_triangle = 0;
     }
-
+*/
     // enable Hoverboard PCB
     if (msg->button_r1 > 0 && msg->button_r1 != _ds4_last_button_r1)
     {
@@ -89,7 +89,7 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     }
 
     // LED headlights 1
-    if (msg->button_l1 > 0 && msg->button_l1 != _ds4_last_button_l1)
+  /*  if (msg->button_l1 > 0 && msg->button_l1 != _ds4_last_button_l1)
     {
         _ds4_last_button_l1 = msg->button_l1;
         rosmower_msgs::setSwitch srv;
@@ -130,11 +130,11 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
     {
         _ds4_last_button_l2 = 0;
     }
-
+*/
     // mow motor speed
-    if (msg->button_square > 0 && msg->button_square != _ds4_last_button_square)
+    if (msg->button_l2 > 0 && msg->button_l2 != _ds4_last_button_l2)
     {
-        _ds4_last_button_square = msg->button_square;
+        _ds4_last_button_l2 = msg->button_l2;
         rosmower_msgs::setMowMotor srv;
         if (_mow_speed == 0)
         {
@@ -147,9 +147,9 @@ void ROSMower_ds4::ds4Callback(const ds4_driver::Status::ConstPtr &msg)
         _srv_mow.call(srv);
     }
     // reset if button has been released
-    if (msg->button_square == 0)
+    if (msg->button_l2 == 0)
     {
-        _ds4_last_button_square = 0;
+        _ds4_last_button_l2 = 0;
     }
 }
 

@@ -29,7 +29,7 @@
 
   <!-- Base controller -->
   <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch">
-    <arg name="device_port" value="/dev/ttyUSB1" />
+    <arg name="device_port" value="/dev/ttyUSB0" />
   </include>  
 
   <!-- OLED Display -->
