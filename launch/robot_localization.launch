@@ -48,7 +48,7 @@
 
   <rosparam command="load" file="$(find rosmower)/conf/robot_localization.yaml" />
     <remap from="raw_odom" to="/hoverboard_velocity_controller/odom"/>
-    <remap from="imu/data" to="bno08x/raw" /> 
+    <remap from="imu/data" to="bno08x/geo_raw" /> 
     <remap from="gps/fix" to="ublox/fix" />
 
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true"/>

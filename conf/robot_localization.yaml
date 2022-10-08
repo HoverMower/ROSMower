@@ -33,9 +33,9 @@ ekf_se_odom:
 
   imu0: imu/data
   imu0_config: [false, false, false,
-                true , true , false,
+                true , true , true,
                 false, false, false,
-                false, false, true,
+                false, false, false,
                 false, false, false]
   imu0_nodelay: false
   imu0_differential: false
@@ -122,9 +122,9 @@ ekf_se_map:
 
   imu0: imu/data
   imu0_config: [false, false, false,
-                true , true , false,
+                true , true , true,
                 false, false, false,
-                false, false, true,
+                false, false, false,
                 false, false, false]
   imu0_nodelay: false
   imu0_differential: false
@@ -175,5 +175,5 @@ navsat_transform:
   broadcast_utm_transform: true
   publish_filtered_gps: true
   use_odometry_yaw: false
-  #wait_for_datum: true
+  wait_for_datum: true
   datum: [50.23629283, 6.69252950, 0.0, map, base_footprint] # origin of world set to rtk base coordinates

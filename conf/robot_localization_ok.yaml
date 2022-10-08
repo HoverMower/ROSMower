@@ -170,7 +170,7 @@ navsat_transform:
   frequency: 10
   delay: 3.0
   magnetic_declination_radians: 0.04729842  # For lat/long of base
-  yaw_offset: 1.570796327  # IMU reads 0 facing magnetic north, not east
+  #yaw_offset: 1.570796327  # IMU reads 0 facing magnetic north, not east
   zero_altitude: true
   broadcast_utm_transform: true
   publish_filtered_gps: true
