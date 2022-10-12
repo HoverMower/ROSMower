@@ -16,13 +16,13 @@
         <include file="$(find rosmower)/launch/ekf_pose.launch">
         </include>
 
-        <include file="$(find rosmower)/launch/rs_d400.launch">
+   <!--     <include file="$(find rosmower)/launch/rs_d400.launch">
                 <arg name="device_type_camera" value="$(arg device_type_camera)"/>
                 <arg name="serial_no_camera" value="$(arg serial_no_camera)"/>
                 <arg name="camera" value="$(arg camera)"/>
                 <arg name="clip_distance" value="$(arg clip_distance)"/>
 
-        </include>
+        </include> -->
 
 
 

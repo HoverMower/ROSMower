@@ -390,11 +390,11 @@ Visualization Manager:
         y_scale: 1
         z_scale: 1
       Class: rviz_imu_plugin/Imu
-      Enabled: false
+      Enabled: true
       Name: Imu
       Topic: /bno08x/geo_raw
       Unreliable: false
-      Value: false
+      Value: true
       fixed_frame_orientation: true
     - Acceleration properties:
         Acc. vector alpha: 1
@@ -413,11 +413,11 @@ Visualization Manager:
         y_scale: 1
         z_scale: 1
       Class: rviz_imu_plugin/Imu
-      Enabled: false
+      Enabled: true
       Name: Imu
       Topic: /bno08x/raw
       Unreliable: false
-      Value: false
+      Value: true
       fixed_frame_orientation: true
   Enabled: true
   Global Options:
@@ -445,26 +445,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/Orbit
-      Distance: 6.444726467132568
+      Class: rviz/XYOrbit
+      Distance: 3.692185878753662
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.21943451464176178
-        Y: 0.2771531045436859
-        Z: -0.1786881387233734
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.309800148010254
+      Pitch: -0.004601776599884033
       Target Frame: base_footprint
-      Value: Orbit (rviz)
-      Yaw: 0.5359536409378052
+      Value: XYOrbit (rviz)
+      Yaw: 0.05039816349744797
     Saved: ~
 Window Geometry:
   Displays:

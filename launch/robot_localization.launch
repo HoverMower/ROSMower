@@ -31,7 +31,9 @@
        <param name="cov_angular" value="0.003" />      <!-- angular covariance +- 3deg/s -->
        <param name="cov_orientation" value="0.002" />  <!-- magnetic covariance +-2.5deg -->
        <param name="cov_magnetic" value="0.002" />     <!-- magnetic covariance +-2.5deg -->
-         </node> 
+       <param name="rotation_vector" type ="bool" value="True"/>
+       <param name="geomag_vector" type ="bool" value="False"/>
+    </node> 
 
 <!--
      This launch file provides an example of how to work with GPS data using robot_localization. It runs three nodes:
@@ -48,7 +50,7 @@
 
   <rosparam command="load" file="$(find rosmower)/conf/robot_localization.yaml" />
     <remap from="raw_odom" to="/hoverboard_velocity_controller/odom"/>
-    <remap from="imu/data" to="bno08x/geo_raw" /> 
+    <remap from="imu/data" to="bno08x/raw" /> 
     <remap from="gps/fix" to="ublox/fix" />
 
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se_odom" clear_params="true"/>
