@@ -9,12 +9,12 @@
   <rosparam file="$(find hoverboard_driver)/config/hardware.yaml" command="load"/>
   <rosparam file="$(find hoverboard_driver)/config/controllers.yaml" command="load"/>
 
-  <!-- PS4 joypad 
+   <!-- PS4 joypad  -->
   <include file="$(find ds4_driver)/launch/ds4_twist.launch">
     <arg name="dof" value="2"/>
     <arg name="topic" value="joy_vel"/>
 
-  </include>-->
+  </include>
 
   <!-- Lidar -->
   <remap from="/LiDAR/LD06" to="scan"/>
@@ -29,7 +29,7 @@
 
   <!-- Base controller -->
   <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch">
-    <arg name="device_port" value="/dev/ttyUSB1" />
+    <arg name="device_port" value="/dev/ttyUSB0" />
   </include>  
 
   <!-- OLED Display -->

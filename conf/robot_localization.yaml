@@ -160,3 +160,4 @@ navsat_transform:
     publish_filtered_gps: true
     use_odometry_yaw: false
     wait_for_datum: false
+    datum: [50.2362244, 6.6925136, 0, map, base_link]
