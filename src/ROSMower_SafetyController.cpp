@@ -213,7 +213,7 @@ void ROSMower_SafetyController::dyn_callback(ROSMower::SafetyControllerConfig &c
              config.timeout_after_unstuck,
              config.bumper_reverse_time);
 
-    allow_unstuck_bumper_ = config.unstuck_perimeter;
+    allow_unstuck_perimeter_ = config.unstuck_perimeter;
     max_perimeter_attemps_ = config.peri_unstuck_attemps;
     unstuck_perimeter_reverse_time_ = config.peri_reverse_time;
     unstuck_perimeter_reverse_speed_ = config.peri_reverse_speed;
