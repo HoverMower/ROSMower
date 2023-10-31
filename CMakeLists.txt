@@ -1,49 +1,61 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(rosmower)
 
-add_compile_options(-std=c++11)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  rosmower_msgs
-  oled_display_node
-  ds4_driver  
-  dynamic_reconfigure  
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
-  sensor_msgs
-  ublox_msgs
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rosmower_msgs REQUIRED)
+find_package(ds4_driver   REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(ublox_msgs REQUIRED)
 
-## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system)
-generate_dynamic_reconfigure_options(
-  conf/safety_controller.cfg
-)
+###########
+## Build ##
+###########
 
-catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp rosmower_msgs
-)
-
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
 include_directories(
  include
  include/ROSMower
- ${catkin_INCLUDE_DIRS}
-# ${Boost_INCLUDE_DIRS}
+ ${Boost_INCLUDE_DIRS}
 )
 
 add_executable(${PROJECT_NAME} 
   src/main.cpp 
-  src/ROSMower_oled.cpp
   src/ROSMower_ds4.cpp
   src/ROSMower_SafetyController.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+ament_target_dependencies(${PROJECT_NAME} rclcpp std_msgs
+  sensor_msgs
+  tf2
+  tf2_ros
+  tf2_geometry_msgs
+  rosmower_msgs
+  ds4_driver
+  ublox_msgs
+  )
 
-add_dependencies(rosmower ${PROJECT_NAME}_gencfg)
+install(TARGETS
+  ${PROJECT_NAME} 
+  DESTINATION lib/${PROJECT_NAME})
 
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
 
+ament_export_include_directories(include)
+ament_export_dependencies(std_msgs)
+ament_package()

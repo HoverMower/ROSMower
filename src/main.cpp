@@ -1,36 +1,21 @@
-#include "ROSMower_oled.h"
-#include "ROSMower_ds4.h"
-#include "ROSMower_SafetyController.h"
+#include "ROSMower_ds4.hpp"
+#include "ROSMower_SafetyController.hpp"
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "ROSMower");
+    rclcpp::init(argc, argv);
 
-    ROSMower_oled oled;
-    ROSMower_ds4 ds4;
-    ROSMower_SafetyController safetyController;
+    auto ds4 = std::make_shared<ROSMower_ds4>("ROSMower_DS4");
+    auto safetyController = std::make_shared<ROSMower_SafetyController>("ROSMower_safetyController");
 
-    ros::AsyncSpinner spinner(0);
-    spinner.start();
+    rclcpp::Rate rate(10.0);
 
-    ros::Rate rate(10.0);
-    int rate_counter = 0;
-
-    while (ros::ok())
+    while (rclcpp::ok())
     {
         // DS4 controller gets startet by constructor
 
         // Safety Controller to monitor bumper and perimeter
-        safetyController.run();
-
-        // slow down oled update
-        rate_counter++;
-        if (rate_counter == 10)
-        {
-            oled.update();
-            rate_counter = 0;
-        }
-
+        safetyController->run();
         rate.sleep();
     }
 
