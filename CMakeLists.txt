@@ -17,7 +17,6 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(ublox_msgs REQUIRED)
 
 ###########
 ## Build ##
@@ -44,7 +43,6 @@ ament_target_dependencies(${PROJECT_NAME} rclcpp std_msgs
   tf2_geometry_msgs
   rosmower_msgs
   ds4_driver
-  ublox_msgs
   )
 
 install(TARGETS

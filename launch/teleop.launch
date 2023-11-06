@@ -1,48 +1,43 @@
 <launch>
   <!-- Model and state publisher -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find rosmower)/urdf/rosmower.xacro"/>
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <param name="robot_description"
+    command="$(find xacro)/xacro --inorder $(find rosmower)/urdf/rosmower.xacro" />
 
 
-  <rosparam file="$(find hoverboard_driver)/config/hardware.yaml" command="load"/>
-  <rosparam file="$(find hoverboard_driver)/config/controllers.yaml" command="load"/>
+  <!-- hoverboard diffbot controller -->
 
-   <!-- PS4 joypad  -->
+  <!-- PS4 joypad  -->
   <include file="$(find ds4_driver)/launch/ds4_twist.launch">
-    <arg name="dof" value="2"/>
-    <arg name="topic" value="joy_vel"/>
+    <arg name="dof" value="2" />
+    <arg name="topic" value="joy_vel" />
 
   </include>
 
   <!-- Lidar -->
-  <remap from="/LiDAR/LD06" to="scan"/>
+  <remap from="/LiDAR/LD06" to="scan" />
   <include file="$(find ldlidar)/launch/ld06.launch">
   </include>
 
   <!-- TWIST MUX -->
   <node pkg="twist_mux" type="twist_mux" name="twist_mux">
-    <rosparam command="load" file="$(find rosmower)/conf/twist_mux.yaml" />
-    <remap from="cmd_vel_out" to="hoverboard_velocity_controller/cmd_vel"/>
+    <param from="$(find rosmower)/conf/twist_mux.yaml" />
+    <remap from="cmd_vel_out" to="hoverboard_velocity_controller/cmd_vel" />
   </node>
 
   <!-- Base controller -->
   <include file="$(find ros_hovermower_base_controller)/launch/base_controller.launch">
     <arg name="device_port" value="$(env ROSMower_USB)" />
-  </include>  
-
-  <!-- OLED Display -->
-  <include file="$(find oled_display_node)/launch/display.launch">
   </include>
-  <node name="rosmower" pkg="rosmower" type="rosmower" />
 
-  <param name="port" type="str" value="/dev/ttyAMA1"/>
-  <node name="hoverboard_driver" pkg="hoverboard_driver" type="hoverboard_driver" output="screen"/>
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/" args="hoverboard_joint_publisher hoverboard_velocity_controller" />
+  <!-- ROSMower Safety Controller-->
+  <node name="rosmower" pkg="rosmower" type="rosmower">
+    <param from="$(find rosmower)/conf/safety_controller.yaml" />
+  </node>
 
-<!-- ROS Bridge for webViz-->
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
-       <arg name="port" value="8080"/>
-    </include>
-    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="screen" />
+  <!-- ROS Bridge for webViz-->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="port" value="8080" />
+  </include>
+  <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher"
+    output="screen" />
 </launch>

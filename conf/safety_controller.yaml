@@ -1,0 +1,15 @@
+ROSMower_SafetyController:
+  ros__parameters:
+    unstuck_bumper: True
+    bumper_unstuck_attemps: 3
+    bumper_reverse_time: 500
+    bumper_reverse_speed: 0.1
+    bumper_rotate_time: 500
+    bumper_rotate_speed: 0.5
+    unstuck_perimeter: False
+    peri_unstuck_attemps: 3
+    peri_reverse_time: 500
+    peri_reverse_speed: 0.1
+    peri_rotate_time: 500
+    peri_rotate_speed: 0.5
+    timeout_after_unstuck: 2

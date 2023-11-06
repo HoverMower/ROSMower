@@ -1,21 +1,58 @@
-#include "ROSMower_SafetyController.h"
+#include "ROSMower_SafetyController.hpp"
 
-ROSMower_SafetyController::ROSMower_SafetyController()
+ROSMower_SafetyController::ROSMower_SafetyController(std::string name) : Node(name)
 {
 
     // Register  publisher
-    pub_eStop = nh.advertise<std_msgs::Bool>("/e_stop", 3);
-    sub_battery = nh.subscribe("hovermower/sensors/Battery", 1000, &ROSMower_SafetyController::batteryCallback, this);
-    sub_perimeter = nh.subscribe("hovermower/sensors/Perimeter", 1000, &ROSMower_SafetyController::perimeterCallback, this);
-    sub_bumper = nh.subscribe("hovermower/sensors/Bumper", 1000, &ROSMower_SafetyController::bumperCallback, this);
-    cmd_vel_bumper = nh.advertise<geometry_msgs::Twist>("/safety_bump_vel", 1000);
+    pub_eStop = create_publisher<std_msgs::msg::Bool>("/e_stop", 3);
+    sub_battery = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Battery", 1000, std::bind(&ROSMower_SafetyController::batteryCallback, this, std::placeholders::_1));
+  //  sub_perimeter = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Perimeter", 1000, std::bind(&ROSMower_SafetyController::perimeterCallback, this, std::placeholders::_1));
+  //  sub_bumper = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Bumper", 1000, std::bind(&ROSMower_SafetyController::bumperCallback, this, std::placeholders::_1));
+    cmd_vel_bumper = create_publisher<geometry_msgs::msg::Twist>("/safety_bump_vel", 1000);
 
-    param_reconfig_callback_ = boost::bind(&ROSMower_SafetyController::dyn_callback, this, _1, _2);
+    // declare parameter
+    declare_parameter("allow_unstuck_bumper", true);
+    declare_parameter("unstuck_bumper_attempts", 3);
+    declare_parameter("unstuck_bumper_reverse_time", 2000);
+    declare_parameter("unstuck_bumper_reverse_speed", 0.5);
+    declare_parameter("unstuck_bumper_rotate_time", 1000);
+    declare_parameter("unstuck_bumper_rotate_speed", 1.0);
+    declare_parameter("max_bumper_attempts", 3);
 
-    param_reconfig_server_.reset(new DynamicReconfigServer());
-    param_reconfig_server_->setCallback(param_reconfig_callback_);
+    declare_parameter("allow_unstuck_perimeter", true);
+    declare_parameter("unstuck_perimeter_attempts", 3);
+    declare_parameter("unstuck_perimeter_reverse_time", 2000);
+    declare_parameter("unstuck_perimeter_reverse_speed", 0.5);
+    declare_parameter("unstuck_perimeter_rotate_time", 1000);
+    declare_parameter("unstuck_perimeter_rotate_speed", 1.0);
+    declare_parameter("max_perimeter_attempts", 3);
 
-    ROS_INFO("ROSMower_SafetyController initialized");
+    declare_parameter("blockingTimeout_unstuck", 1000);
+
+    get_parameter("allow_unstuck_bumper", allow_unstuck_bumper_);
+    get_parameter("unstuck_bumper_attempts", unstuck_bumper_attempts_);
+    get_parameter("unstuck_bumper_reverse_time", unstuck_bumper_reverse_time_);
+    get_parameter("unstuck_bumper_reverse_speed", unstuck_bumper_reverse_speed_);
+    get_parameter("unstuck_bumper_rotate_time", unstuck_bumper_rotate_time_);
+    get_parameter("unstuck_bumper_rotate_speed", unstuck_bumper_rotate_speed_);
+    get_parameter("max_bumper_attempts", max_bumper_attempts_);
+
+
+    get_parameter("allow_unstuck_perimeter", allow_unstuck_perimeter_);
+    get_parameter("unstuck_perimeter_attempts", unstuck_perimeter_attempts_);
+    get_parameter("unstuck_perimeter_reverse_time", unstuck_perimeter_reverse_time_);
+    get_parameter("unstuck_perimeter_reverse_speed", unstuck_perimeter_reverse_speed_);
+    get_parameter("unstuck_perimeter_rotate_time", unstuck_perimeter_rotate_time_);
+    get_parameter("unstuck_perimeter_rotate_speed", unstuck_perimeter_rotate_speed_);
+    get_parameter("max_perimeter_attempts", max_perimeter_attempts_);
+
+    get_parameter("blockingTimeout_unstuck", blockingTimeout_unstuck_);
+    
+    // register parameter change callback handle
+    callback_handle_ = this->add_on_set_parameters_callback(
+        std::bind(&ROSMower_SafetyController::parametersCallback, this, std::placeholders::_1));
+
+    RCLCPP_INFO(get_logger(), "ROSMower_SafetyController initialized");
 }
 
 ROSMower_SafetyController::~ROSMower_SafetyController()
@@ -31,14 +68,14 @@ void ROSMower_SafetyController::run()
         perimeter_unstuck();
 }
 
-void ROSMower_SafetyController::batteryCallback(const rosmower_msgs::Battery::ConstPtr &msg)
+void ROSMower_SafetyController::batteryCallback(const rosmower_msgs::msg::Battery::SharedPtr msg)
 {
 }
 
 void ROSMower_SafetyController::bumper_unstuck()
 {
-    geometry_msgs::Twist cmd_vel_msg;
-    ros::Rate rate(50);
+    geometry_msgs::msg::Twist cmd_vel_msg;
+    rclcpp::Rate rate(50);
 
     if (unstuck_bumper_) // only if we need to unstuck
     {
@@ -47,34 +84,34 @@ void ROSMower_SafetyController::bumper_unstuck()
         {
 
             // first try to reverse to unblock
-            if (unstuck_bumper_attemps_ < max_bumper_attemps_)
+            if (unstuck_bumper_attempts_ < max_bumper_attempts_)
             {
-                ROS_INFO("ROSMower SafetyController, reverse to unstuck bumper");
+                RCLCPP_INFO(get_logger(), "ROSMower SafetyController, reverse to unstuck bumper");
                 cmd_vel_msg.linear.x = unstuck_bumper_reverse_speed_ * -1;
 
-                ros::Time reverse_time = ros::Time::now() + ros::Duration(unstuck_bumper_reverse_time_ / 1000.0);
+                rclcpp::Time reverse_time = get_clock()->now() + rclcpp::Duration::from_seconds(unstuck_bumper_reverse_time_ / 1000.0);
 
                 // reverse as long as defined in configuration
-                while (ros::ok() && reverse_time > ros::Time::now())
+                while (rclcpp::ok() && reverse_time > get_clock()->now())
                 {
-                    cmd_vel_bumper.publish(cmd_vel_msg);
-                    ros::spinOnce();
+                    cmd_vel_bumper->publish(cmd_vel_msg);
+                   // rclcpp::spin_some(this);
                     rate.sleep();
                 }
-                unstuck_bumper_attemps_++;
+                unstuck_bumper_attempts_++;
             }
-            // we raised the max attemps, EMERGENCY STOP
+            // we raised the max attempts, EMERGENCY STOP
             else
             {
-                ROS_ERROR("ROSMower SafetyController unable to unstuck bumper");
+                RCLCPP_ERROR(get_logger(), "ROSMower SafetyController unable to unstuck bumper");
                 cmd_vel_msg.linear.x = 0.0;
                 cmd_vel_msg.angular.z = 0.0;
-                cmd_vel_bumper.publish(cmd_vel_msg);
+                cmd_vel_bumper->publish(cmd_vel_msg);
 
-                std_msgs::Bool msg_estop;
+                std_msgs::msg::Bool msg_estop;
                 msg_estop.data = true;
-                pub_eStop.publish(msg_estop);
-                ros::spinOnce();
+                pub_eStop->publish(msg_estop);
+                //rclcpp::spin_some(this);
             }
         }
         else
@@ -88,28 +125,28 @@ void ROSMower_SafetyController::bumper_unstuck()
                 cmd_vel_msg.angular.z = cmd_vel_msg.angular.z * -1;
             }
 
-            ros::Time rotate_time = ros::Time::now() + ros::Duration(unstuck_bumper_rotate_time_ / 1000.0);
+            rclcpp::Time rotate_time = get_clock()->now() + rclcpp::Duration::from_seconds(unstuck_bumper_rotate_time_ / 1000.0);
 
             // reverse as long as defined in configuration
-            while (ros::ok() && rotate_time > ros::Time::now())
+            while (rclcpp::ok() && rotate_time > get_clock()->now())
             {
-                cmd_vel_bumper.publish(cmd_vel_msg);
-                ros::spinOnce();
+                cmd_vel_bumper->publish(cmd_vel_msg);
+               // rclcpp::spin_some(this);
                 rate.sleep();
             }
 
-            unstuck_bumper_attemps_ = 0;
+            unstuck_bumper_attempts_ = 0;
             unstuck_bumper_ = false;
             unstuck_bumper_left_ = false;
             unstuck_bumper_right_ = false;
-            ROS_INFO("ROSMower SafetyController unstuck bumper complete");
+            RCLCPP_INFO(get_logger(), "ROSMower SafetyController unstuck bumper complete");
         }
     }
 }
 void ROSMower_SafetyController::perimeter_unstuck()
 {
-    geometry_msgs::Twist cmd_vel_msg;
-    ros::Rate rate(50);
+    geometry_msgs::msg::Twist cmd_vel_msg;
+    rclcpp::Rate rate(50);
 
     if (unstuck_perimeter_) // only if we need to unstuck
     {
@@ -118,34 +155,34 @@ void ROSMower_SafetyController::perimeter_unstuck()
         {
 
             // first try to reverse to unblock
-            if (unstuck_perimeter_attemps_ < max_perimeter_attemps_)
+            if (unstuck_perimeter_attempts_ < max_perimeter_attempts_)
             {
-                ROS_INFO("ROSMower SafetyController, reverse to recover perimeter");
+                RCLCPP_INFO(get_logger(), "ROSMower SafetyController, reverse to recover perimeter");
                 cmd_vel_msg.linear.x = unstuck_perimeter_reverse_speed_ * -1;
 
-                ros::Time reverse_time = ros::Time::now() + ros::Duration(unstuck_perimeter_reverse_time_ / 1000.0);
+                rclcpp::Time reverse_time = get_clock()->now() + rclcpp::Duration::from_seconds(unstuck_perimeter_reverse_time_ / 1000.0);
 
                 // reverse as long as defined in configuration
-                while (ros::ok() && reverse_time > ros::Time::now())
+                while (rclcpp::ok() && reverse_time > get_clock()->now())
                 {
-                    cmd_vel_perimeter.publish(cmd_vel_msg);
-                    ros::spinOnce();
+                    cmd_vel_perimeter->publish(cmd_vel_msg);
+                    //rclcpp::spin_some(this);
                     rate.sleep();
                 }
-                unstuck_perimeter_attemps_++;
+                unstuck_perimeter_attempts_++;
             }
-            // we raised the max attemps, EMERGENCY STOP
+            // we raised the max attempts, EMERGENCY STOP
             else
             {
-                ROS_ERROR("ROSMower SafetyController unable to recover perimeter");
+                RCLCPP_ERROR(get_logger(), "ROSMower SafetyController unable to recover perimeter");
                 cmd_vel_msg.linear.x = 0.0;
                 cmd_vel_msg.angular.z = 0.0;
-                cmd_vel_bumper.publish(cmd_vel_msg);
+                cmd_vel_bumper->publish(cmd_vel_msg);
 
-                std_msgs::Bool msg_estop;
+                std_msgs::msg::Bool msg_estop;
                 msg_estop.data = true;
-                pub_eStop.publish(msg_estop);
-                ros::spinOnce();
+                pub_eStop->publish(msg_estop);
+               // rclcpp::spin_some(this);
             }
         }
         else
@@ -159,25 +196,25 @@ void ROSMower_SafetyController::perimeter_unstuck()
                 cmd_vel_msg.angular.z = cmd_vel_msg.angular.z * -1;
             }
 
-            ros::Time rotate_time = ros::Time::now() + ros::Duration(unstuck_perimeter_rotate_time_ / 1000.0);
+            rclcpp::Time rotate_time = get_clock()->now() + rclcpp::Duration::from_seconds(unstuck_perimeter_rotate_time_ / 1000.0);
 
             // reverse as long as defined in configuration
-            while (ros::ok() && rotate_time > ros::Time::now())
+            while (rclcpp::ok() && rotate_time > get_clock()->now())
             {
-                cmd_vel_perimeter.publish(cmd_vel_msg);
-                ros::spinOnce();
+                cmd_vel_perimeter->publish(cmd_vel_msg);
+               // rclcpp::spin_some(this);
                 rate.sleep();
             }
 
-            unstuck_perimeter_attemps_ = 0;
+            unstuck_perimeter_attempts_ = 0;
             unstuck_perimeter_ = false;
             unstuck_perimeter_left_ = false;
             unstuck_perimeter_right_ = false;
-            ROS_INFO("ROSMower SafetyController recover perimeter complete");
+            RCLCPP_INFO(get_logger(), "ROSMower SafetyController recover perimeter complete");
         }
     }
 }
-void ROSMower_SafetyController::bumperCallback(const rosmower_msgs::Bumper::ConstPtr &msg)
+void ROSMower_SafetyController::bumperCallback(const rosmower_msgs::msg::Bumper::SharedPtr msg)
 {
 
     if (unstuck_bumper_ == false && (msg->left == true || msg->right == true))
@@ -185,46 +222,93 @@ void ROSMower_SafetyController::bumperCallback(const rosmower_msgs::Bumper::Cons
         unstuck_bumper_ = true;
         unstuck_bumper_left_ = msg->left;
         unstuck_bumper_right_ = msg->right;
-        ROS_WARN("ROSMower SafetyController start unstuck bumper");
+        RCLCPP_WARN(get_logger(), "ROSMower SafetyController start unstuck bumper");
     }
     last_bumper_left_ = msg->left;
     last_bumper_right_ = msg->right;
 }
 
-void ROSMower_SafetyController::perimeterCallback(const rosmower_msgs::PerimeterMsg::ConstPtr &msg)
+void ROSMower_SafetyController::perimeterCallback(const rosmower_msgs::msg::Perimeter::SharedPtr msg)
 {
     if (unstuck_perimeter_ == false && (msg->left_inside == false || msg->right_inside == false))
     {
         unstuck_perimeter_ = true;
         unstuck_perimeter_left_ = !msg->left_inside;
         unstuck_perimeter_right_ = !msg->right_inside;
-        ROS_WARN("ROSMower SafetyController start recover perimeter");
+        RCLCPP_WARN(get_logger(), "ROSMower SafetyController start recover perimeter");
     }
     last_peri_out_left_ = !msg->left_inside;
     last_peri_out_right_ = !msg->right_inside;
 }
 
-void ROSMower_SafetyController::dyn_callback(ROSMower::SafetyControllerConfig &config, uint32_t level)
+rcl_interfaces::msg::SetParametersResult ROSMower_SafetyController::parametersCallback(
+    const std::vector<rclcpp::Parameter> &parameters)
 {
-    // TODO: format reconfigure nicely
-    ROS_INFO("ROSMower SafetyController Reconfigure Request: bumper_attemps: %i perimeter_attemps: %i suppress cmd_vel: %i sec bumper_reverse_time: %i ms",
-             config.bumper_unstuck_attemps,
-             config.peri_unstuck_attemps,
-             config.timeout_after_unstuck,
-             config.bumper_reverse_time);
+    rcl_interfaces::msg::SetParametersResult result;
+    result.successful = true;
+    result.reason = "success";
+    // Here update class attributes, do some actions, etc.
+    for (const auto &param : parameters)
+    { // TODO: format reconfigure nicely
+        if (param.get_name() == "unstuck_perimeter")
+        {
+            allow_unstuck_perimeter_ = param.as_bool();
+        }
 
-    allow_unstuck_perimeter_ = config.unstuck_perimeter;
-    max_perimeter_attemps_ = config.peri_unstuck_attemps;
-    unstuck_perimeter_reverse_time_ = config.peri_reverse_time;
-    unstuck_perimeter_reverse_speed_ = config.peri_reverse_speed;
-    unstuck_perimeter_rotate_time_ = config.peri_rotate_time;
-    unstuck_perimeter_rotate_speed_ = config.peri_rotate_speed;
+        if (param.get_name() == "max_perimeter_attempts")
+        {
+            max_perimeter_attempts_ = param.as_int();
+        }
 
-    allow_unstuck_bumper_ = config.unstuck_bumper;
-    unstuck_bumper_reverse_time_ = config.bumper_reverse_time;
-    unstuck_bumper_reverse_speed_ = config.bumper_reverse_speed;
-    unstuck_bumper_rotate_time_ = config.bumper_rotate_time;
-    unstuck_bumper_rotate_speed_ = config.bumper_rotate_speed;
-    max_bumper_attemps_ = config.bumper_unstuck_attemps;
-    blockingTimeout_unstuck_ = config.timeout_after_unstuck;
+        if (param.get_name() == "unstuck_perimeter_reverse_time")
+        {
+            unstuck_perimeter_reverse_time_ = param.as_int();
+        }
+        if (param.get_name() == "unstuck_perimeter_reverse_speed")
+        {
+            unstuck_perimeter_reverse_speed_ = param.as_double();
+        }
+        if (param.get_name() == "unstuck_perimeter_rotate_time")
+        {
+            unstuck_perimeter_rotate_time_ = param.as_int();
+        }
+        if (param.get_name() == "unstuck_perimeter_rotate_speed")
+        {
+            unstuck_perimeter_rotate_speed_ = param.as_double();
+        }
+
+        if (param.get_name() == "allow_unstuck_bumper")
+        {
+            allow_unstuck_bumper_ = param.as_bool();
+        }
+        if (param.get_name() == "unstuck_buper_reverse_time")
+        {
+            unstuck_bumper_reverse_time_ = param.as_int();
+        }
+        if (param.get_name() == "unstuck_bumper_reverse_speed")
+        {
+            unstuck_bumper_reverse_speed_ = param.as_double();
+        }
+        if (param.get_name() == "unstuck_bumper_rotate_time")
+        {
+            unstuck_bumper_rotate_time_ = param.as_int();
+        }
+        if (param.get_name() == "unstuck_bumper_reverse_speed")
+        {
+            unstuck_bumper_reverse_speed_ = param.as_double();
+        }
+        if (param.get_name() == "max_bumper_attempts")
+        {
+            max_bumper_attempts_ = param.as_int();
+        }
+        if (param.get_name() == "timeout_after_unstuck")
+        {
+            blockingTimeout_unstuck_ = param.as_int();
+        }
+    }
+    RCLCPP_INFO(get_logger(), "ROSMower SafetyController Reconfigure Request: bumper_attempts: %i perimeter_attempts: %i suppress cmd_vel: %i sec bumper_reverse_time: %i ms",
+                unstuck_bumper_attempts_,
+                unstuck_perimeter_attempts_,
+                blockingTimeout_unstuck_,
+                unstuck_bumper_reverse_time_);
 }

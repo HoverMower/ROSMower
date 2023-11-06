@@ -1,26 +1,28 @@
-topics:
-- name    : joypad
-  topic   : joy_vel
-  timeout : 0.1
-  priority: 100
-- name    : safety_controller_bumper
-  topic   : safety_bump_vel
-  timeout : 0.1
-  priority: 50
-- name    : safety_controller_perimeter
-  topic   : safety_peri_vel
-  timeout : 0.1
-  priority: 50    
-- name    : keyboard
-  topic   : keyboard_teleop/cmd_vel
-  timeout : 0.1
-  priority: 99
-- name    : navigation
-  topic   : nav_cmd_vel
-  timeout : 0.1
-  priority: 5
-locks:
-- name    : e_stop
-  topic   : e_stop
-  timeout : 0.0
-  priority: 100
+twist_mux:
+  ros__parameters:
+  topics:
+    - name: joypad
+      topic: joy_vel
+      timeout: 0.1
+      priority: 100
+    - name: safety_controller_bumper
+      topic: safety_bump_vel
+      timeout: 0.1
+      priority: 50
+    - name: safety_controller_perimeter
+      topic: safety_peri_vel
+      timeout: 0.1
+      priority: 50
+    - name: keyboard
+      topic: keyboard_teleop/cmd_vel
+      timeout: 0.1
+      priority: 99
+    - name: navigation
+      topic: nav_cmd_vel
+      timeout: 0.1
+      priority: 5
+  locks:
+    - name: e_stop
+      topic: e_stop
+      timeout: 0.0
+      priority: 100

@@ -1,11 +1,11 @@
 #ifndef _ROSMOWER_DS4_H
 #define _ROSMOWER_DS4_H
 
-#include <rclcpp/rclcpp.h>
+#include <rclcpp/rclcpp.hpp>
 #include <string.h>
 #include <stdio.h>
 #include "std_msgs/msg/bool.hpp"
-#include "ds4_driver/msg/status.hpp"
+#include "ds4_driver_msgs/msg/status.hpp"
 #include "sensor_msgs/msg/joy.hpp"
 #include "rosmower_msgs/srv/press_switch.hpp"
 #include "rosmower_msgs/srv/set_switch.hpp"
