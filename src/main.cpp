@@ -1,22 +1,22 @@
-#include "ROSMower_ds4.hpp"
+#include "ROSMower_joystick.hpp"
 #include "ROSMower_SafetyController.hpp"
 
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
 
-    auto ds4 = std::make_shared<ROSMower_ds4>("ROSMower_DS4");
+    auto joy = std::make_shared<ROSMower_joystick>("ROSMower_Joy");
     auto safetyController = std::make_shared<ROSMower_SafetyController>("ROSMower_safetyController");
 
     rclcpp::Rate rate(20.0);
 
     while (rclcpp::ok())
     {
-        // DS4 controller gets startet by constructor
+        // Joy controller node gets startet by constructor
 
         // Safety Controller to monitor bumper and perimeter
         safetyController->run();
-        rclcpp::spin(ds4);
+        rclcpp::spin(joy);
         rclcpp::spin(safetyController);
         rate.sleep();
     }

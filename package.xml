@@ -9,7 +9,6 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>rclcpp</build_depend>
   <build_depend>rosmower_msgs</build_depend>
-  <build_depend>ds4_driver</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>tf2_ros</build_depend>
   <build_depend>tf2_geometry_msgs</build_depend>
@@ -18,7 +17,6 @@
   <build_export_depend>rclcpp</build_export_depend>
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>rosmower_msgs</exec_depend>
-  <exec_depend>ds4_driver</exec_depend>
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>

@@ -5,9 +5,9 @@ ROSMower_SafetyController::ROSMower_SafetyController(std::string name) : Node(na
 
     // Register  publisher
     pub_eStop = create_publisher<std_msgs::msg::Bool>("/e_stop", 3);
-    sub_battery = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Battery", 1000, std::bind(&ROSMower_SafetyController::batteryCallback, this, std::placeholders::_1));
-  //  sub_perimeter = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Perimeter", 1000, std::bind(&ROSMower_SafetyController::perimeterCallback, this, std::placeholders::_1));
-  //  sub_bumper = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/Bumper", 1000, std::bind(&ROSMower_SafetyController::bumperCallback, this, std::placeholders::_1));
+    sub_battery = create_subscription<rosmower_msgs::msg::Battery>("hovermower/sensors/Battery", 1000, std::bind(&ROSMower_SafetyController::batteryCallback, this, std::placeholders::_1));
+    sub_perimeter = create_subscription<rosmower_msgs::msg::Perimeter>("hovermower/sensors/Perimeter", 1000, std::bind(&ROSMower_SafetyController::perimeterCallback, this, std::placeholders::_1));
+    sub_bumper = create_subscription<rosmower_msgs::msg::Bumper>("hovermower/sensors/Bumper", 1000, std::bind(&ROSMower_SafetyController::bumperCallback, this, std::placeholders::_1));
     cmd_vel_bumper = create_publisher<geometry_msgs::msg::Twist>("/safety_bump_vel", 1000);
 
     // declare parameter
