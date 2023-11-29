@@ -5,9 +5,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "std_msgs/msg/bool.hpp"
+#include "sensor_msgs/msg/battery_state.hpp"
 #include "rosmower_msgs/msg/perimeter.hpp"
-#include "rosmower_msgs/msg/bumper.hpp"
-#include "rosmower_msgs/msg/battery.hpp"
 #include "rosmower_msgs/msg/mow_motor.hpp"
 #include <geometry_msgs/msg/twist.hpp>
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
@@ -18,9 +17,10 @@ public:
     ROSMower_SafetyController(std::string name);
     ~ROSMower_SafetyController();
 
-    void batteryCallback(const rosmower_msgs::msg::Battery::SharedPtr msg);
+    void batteryCallback(const sensor_msgs::msg::BatteryState::SharedPtr msg);
     void perimeterCallback(const rosmower_msgs::msg::Perimeter::SharedPtr msg);
-    void bumperCallback(const rosmower_msgs::msg::Bumper::SharedPtr msg);
+    void bumperleftCallback(const std_msgs::msg::Bool::SharedPtr msg);
+    void bumperrightCallback(const std_msgs::msg::Bool::SharedPtr msg);
     void run();
     rcl_interfaces::msg::SetParametersResult parametersCallback(
         const std::vector<rclcpp::Parameter> &parameters);
@@ -35,9 +35,10 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pub_eStop;
 
     // Subscriber
-    rclcpp::Subscription<rosmower_msgs::msg::Battery>::SharedPtr sub_battery;
+    rclcpp::Subscription<sensor_msgs::msg::BatteryState>::SharedPtr sub_battery;
     rclcpp::Subscription<rosmower_msgs::msg::Perimeter>::SharedPtr sub_perimeter;
-    rclcpp::Subscription<rosmower_msgs::msg::Bumper>::SharedPtr sub_bumper;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_left;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr sub_bumper_right;
 
     // Parameter Callback handle
     OnSetParametersCallbackHandle::SharedPtr callback_handle_;

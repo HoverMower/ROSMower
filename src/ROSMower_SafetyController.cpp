@@ -5,9 +5,10 @@ ROSMower_SafetyController::ROSMower_SafetyController(std::string name) : Node(na
 
     // Register  publisher
     pub_eStop = create_publisher<std_msgs::msg::Bool>("/e_stop", 3);
-    sub_battery = create_subscription<rosmower_msgs::msg::Battery>("hovermower/sensors/Battery", 1000, std::bind(&ROSMower_SafetyController::batteryCallback, this, std::placeholders::_1));
+    sub_battery = create_subscription<sensor_msgs::msg::BatteryState>("hovermower/sensors/Battery", 1000, std::bind(&ROSMower_SafetyController::batteryCallback, this, std::placeholders::_1));
     sub_perimeter = create_subscription<rosmower_msgs::msg::Perimeter>("hovermower/sensors/Perimeter", 1000, std::bind(&ROSMower_SafetyController::perimeterCallback, this, std::placeholders::_1));
-    sub_bumper = create_subscription<rosmower_msgs::msg::Bumper>("hovermower/sensors/Bumper", 1000, std::bind(&ROSMower_SafetyController::bumperCallback, this, std::placeholders::_1));
+    sub_bumper_left = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/bumper/left", 1000, std::bind(&ROSMower_SafetyController::bumperleftCallback, this, std::placeholders::_1));
+    sub_bumper_left = create_subscription<std_msgs::msg::Bool>("hovermower/sensors/bumper/right", 1000, std::bind(&ROSMower_SafetyController::bumperrightCallback, this, std::placeholders::_1));
     cmd_vel_bumper = create_publisher<geometry_msgs::msg::Twist>("/safety_bump_vel", 1000);
 
     // declare parameter
@@ -68,7 +69,7 @@ void ROSMower_SafetyController::run()
         perimeter_unstuck();
 }
 
-void ROSMower_SafetyController::batteryCallback(const rosmower_msgs::msg::Battery::SharedPtr msg)
+void ROSMower_SafetyController::batteryCallback(const sensor_msgs::msg::BatteryState::SharedPtr msg)
 {
 }
 
@@ -214,18 +215,28 @@ void ROSMower_SafetyController::perimeter_unstuck()
         }
     }
 }
-void ROSMower_SafetyController::bumperCallback(const rosmower_msgs::msg::Bumper::SharedPtr msg)
+void ROSMower_SafetyController::bumperleftCallback(const  std_msgs::msg::Bool::SharedPtr msg)
 {
 
-    if (unstuck_bumper_ == false && (msg->left == true || msg->right == true))
+    if (unstuck_bumper_ == false && (msg->data == true ))
     {
         unstuck_bumper_ = true;
-        unstuck_bumper_left_ = msg->left;
-        unstuck_bumper_right_ = msg->right;
+        unstuck_bumper_left_ = msg->data;
         RCLCPP_WARN(get_logger(), "ROSMower SafetyController start unstuck bumper");
     }
-    last_bumper_left_ = msg->left;
-    last_bumper_right_ = msg->right;
+    last_bumper_left_ = msg->data;
+}
+
+void ROSMower_SafetyController::bumperrightCallback(const std_msgs::msg::Bool::SharedPtr msg)
+{
+
+    if (unstuck_bumper_ == false && (msg->data == true))
+    {
+        unstuck_bumper_ = true;
+        unstuck_bumper_right_ = msg->data;
+        RCLCPP_WARN(get_logger(), "ROSMower SafetyController start unstuck bumper");
+    }
+    last_bumper_right_ = msg->data;
 }
 
 void ROSMower_SafetyController::perimeterCallback(const rosmower_msgs::msg::Perimeter::SharedPtr msg)
